@@ -50,4 +50,4 @@ if islocal:
 # Code
 
 a, b = input_(int, t=1)
-print_(a+b)
+print_(a + b)
