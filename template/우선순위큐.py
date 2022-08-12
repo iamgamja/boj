@@ -1,9 +1,16 @@
 class 우선순위큐:
+  '''
+  q = 우선순위큐(lambda a, b: a>b)
+  q += 1
+  q += 2
+  print(-q)
+  '''
+
   def __init__(self, op):
     self.tree = [None]
     self.op = op  # op(a, b): a가 b보다 우선순위가 높다면 True
 
-  def append(self, x):
+  def __add__(self, x):
     l = len(self.tree)
     self.tree.append(x)
     while 1:
@@ -15,7 +22,7 @@ class 우선순위큐:
         self.tree[l], self.tree[l // 2] = self.tree[l // 2], self.tree[l]
         l //= 2
 
-  def pop(self):
+  def __neg__(self):
     if len(self.tree) == 1:
       return None
 
