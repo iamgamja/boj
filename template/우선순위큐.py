@@ -1,8 +1,8 @@
 class 우선순위큐:
   '''
   q = 우선순위큐(lambda a, b: a>b)
-  q += 1
-  q += 2
+  q + 1
+  q + 2
   print(-q)
   '''
 
