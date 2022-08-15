@@ -6,3 +6,5 @@ child.stdin.setEncoding("utf-8");
 child.stdout.pipe(process.stdout);
 child.stdin.write(data.trim() + "\n");
 child.stdin.end();
+
+child.stderr.pipe(process.stderr);
