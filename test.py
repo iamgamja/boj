@@ -1,3 +1,5 @@
+import random
+
 r = []
 
 r.append('1 2')
