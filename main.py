@@ -43,6 +43,12 @@ else:
   def debug(*a): pass
   def debug2dlist(a): pass
 
+
+def ok(*r):
+  print_(*r)
+  sys.exit(0)
+
+
 if islocal:
   print_('[Running in Local]')
 
