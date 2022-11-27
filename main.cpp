@@ -10,7 +10,9 @@ void fastio()
 
 int main(void)
 {
+#ifdef ONLINE_JUDGE
   fastio();
+#endif
 
   // code
 }
