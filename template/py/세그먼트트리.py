@@ -7,13 +7,13 @@ class 세그먼트트리:
   '''
 
   def __init__(self, a, op):
-    self.a = [None] + a
+    self.n = len(a)
     self.op = op
-    self.tree = [None] * (2 ** (math.ceil(math.log2(len(self.a) - 1)) + 1))
+    self.tree = [None] * (2 ** (math.ceil(math.log2(self.n)) + 1))
 
-    def tmp(idx=1, start=1, end=len(self.a) - 1):
+    def tmp(idx=1, start=1, end=self.n):
       if start == end:
-        self.tree[idx] = self.a[start]
+        self.tree[idx] = a[start-1]
       else:
         tmp(idx * 2, start, (start + end) // 2)
         tmp(idx * 2 + 1, (start + end) // 2 + 1, end)
@@ -21,7 +21,7 @@ class 세그먼트트리:
     tmp()
 
   def get(self, left, right):
-    def tmp(idx=1, start=1, end=len(self.a) - 1):
+    def tmp(idx=1, start=1, end=self.n):
       if left > end or right < start:
         return None
       if left <= start and end <= right:
@@ -36,10 +36,7 @@ class 세그먼트트리:
     return tmp()
 
   def set(self, setIdx, value):
-    lastValue = self.a[setIdx]
-    self.a[setIdx] = value
-
-    def tmp(idx=1, start=1, end=len(self.a) - 1):
+    def tmp(idx=1, start=1, end=self.n):
       if setIdx < start or setIdx > end:
         return
       if start == end:
