@@ -1,3 +1,6 @@
+#include <vector>
+using namespace std;
+
 namespace DisJointSet {
 constexpr int none = -1;
 vector<int> nodes;
@@ -6,6 +9,12 @@ vector<int> depth;
 
 // [ {s}, {s+1}, ..., {e} ]
 void init(int s, int e) {
+  for (int i = 0; i < s; i++) { // index를 맞추기 위한
+    nodes.push_back(none);
+    parent.push_back(none);
+    depth.push_back(none);
+  }
+
   for (int i = s; i <= e; i++) {
     nodes.push_back(i);
     parent.push_back(none);
