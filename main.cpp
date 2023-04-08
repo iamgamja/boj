@@ -1,6 +1,5 @@
-#include <iostream>
+#include <bits/stdc++.h>
 using namespace std;
-
 #define ll long long
 
 void fastio() {
@@ -10,9 +9,7 @@ void fastio() {
 }
 
 int main(void) {
-#ifdef ONLINE_JUDGE
   fastio();
-#endif
 
   // code
 }
