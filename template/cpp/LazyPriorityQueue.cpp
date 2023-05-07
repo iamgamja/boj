@@ -11,7 +11,7 @@ class LazyPriorityQueue {
   map<T, int> count;
 
   public:
-  LazyPriorityQueue(vector<T> arr = {}) {
+  LazyPriorityQueue(vector<T> &arr = {}) {
     for (T x : arr) {
       q.push(x);
     }
