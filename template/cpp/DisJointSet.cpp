@@ -1,14 +1,18 @@
-#include <vector>
+#ifndef mainfile
+#include <bits/stdc++.h>
 using namespace std;
+#endif
 
-namespace DisJointSet {
-  constexpr int none = -1;
+class DisJointSet {
+  private:
+  const int none = -1;
   vector<int> nodes;
   vector<int> parent;
   vector<int> depth;
 
+  public:
   // [ {s}, {s+1}, ..., {e} ]
-  void init(int s, int e) {
+  DisJointSet(int s, int e) {
     for (int i = 0; i < s; i++) { // index를 맞추기 위한
       nodes.push_back(none);
       parent.push_back(none);
@@ -45,4 +49,4 @@ namespace DisJointSet {
     if (depth[ar] == depth[br])
       depth[br]++; // 만약 같았다면 b에 a를 합쳤을 것이고, 깊이가 1 증가할 것
   }
-} // namespace DisJointSet
+};
