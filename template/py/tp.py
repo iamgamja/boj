@@ -1,1 +1,1 @@
-import sys;from decimal import Decimal as D;from collections import deque,defaultdict;input=lambda:sys.stdin.readline().rstrip();mi=lambda:map(int,input().split());ii=lambda:int(input())
+import sys;from decimal import Decimal as D,getcontext as _g;_c=_g();_c.rounding='ROUND_HALF_UP';from collections import deque,defaultdict;input=lambda:sys.stdin.readline().rstrip();mi=lambda:map(int,input().split());ii=lambda:int(input())
