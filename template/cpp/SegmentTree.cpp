@@ -49,7 +49,6 @@ class SegmentTree {
       return;
 
     if (s == e) {
-      a[i] = v;
       tree[node] = v;
       return;
     }
