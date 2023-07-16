@@ -1,6 +1,7 @@
 *.tmp
 
 .cph
-.vscode
+.vscode/*
+!.vscode/*.code-snippets
 
 main.exe
