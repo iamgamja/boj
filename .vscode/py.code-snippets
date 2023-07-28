@@ -3,7 +3,7 @@
     "scope": "python",
     "prefix": "py",
     "body": [
-      "import sys;from decimal import Decimal as D,getcontext as _g;_c=_g();_c.rounding='ROUND_HALF_UP';from collections import deque,defaultdict;input=lambda:sys.stdin.readline().rstrip();si=lambda:input().split();mi=lambda:map(int,si());ii=lambda:int(input());li=lambda:list(mi())",
+      "import sys;from decimal import Decimal;from collections import deque,defaultdict;input=lambda:sys.stdin.readline().rstrip();mi=lambda f=int:map(f,input().split());ii=lambda:int(input())",
       "",
       ""
     ],
