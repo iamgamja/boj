@@ -1,1 +1,1 @@
-import sys;from decimal import Decimal;from collections import deque,defaultdict;input=lambda:(tmp:=sys.stdin.readline())[~tmp.endswith('\n')::-1];mi=lambda f=int:map(f,input().split());ii=lambda:int(input())
+import sys;from decimal import Decimal;from collections import deque,defaultdict;input=lambda:(tmp:=sys.stdin.readline())[~tmp.endswith('\n')::-1][::-1];mi=lambda f=int:map(f,input().split());ii=lambda:int(input())
