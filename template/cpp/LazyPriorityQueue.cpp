@@ -12,14 +12,17 @@ class LazyPriorityQueue {
 
   public:
   LazyPriorityQueue(vector<T> &arr = {}) {
-    for (T x : arr) {
-      q.push(x);
-    }
-  };
+    for (auto x: arr) push(x);
+  }
 
   void push(T x) {
     q.push(x);
     count[x]++;
+  }
+
+  void remove(T x) {
+    lazy[x]++;
+    count[x]--;
   }
 
   T pop() {
@@ -33,16 +36,5 @@ class LazyPriorityQueue {
       lazy[tmp]--;
     }
     throw runtime_error("Queue is empty.");
-  }
-
-  bool canRemove(T x) {
-    return count[x] != 0;
-  }
-
-  void remove(T x) {
-    assert(canRemove(x));
-
-    lazy[x]++;
-    count[x]--;
   }
 };
