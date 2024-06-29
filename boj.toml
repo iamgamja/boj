@@ -1,0 +1,44 @@
+# start: multiline string
+# 시작 시에 줄 단위로 자동으로 실행됩니다.
+start = '''
+set credentials $BUB_BOJAUTOLOGIN $BUB_ONLINEJUDGE
+preset py
+'''
+
+# preset: array of objects
+# name은 필수 항목이며, 나머지는 모두 생략할 수 있습니다.
+[[preset]]
+name = 'rust'
+init = ''
+build = 'cargo build --release'
+cmd = './target/release/boj'
+input = 'input.txt'
+lang = 'Rust 2021'
+file = 'src/main.rs'
+
+[[preset]]
+name = 'cpp'
+init = ''
+build = 'g++ main.cpp -o main -O2 -Wall -lm -static -std=gnu++20 -DONLINE_JUDGE -DBOJ'
+cmd = './main'
+input = 'input.txt'
+lang = 'C++20'
+file = 'main.cpp'
+
+[[preset]]
+name = 'py'
+init = ''
+build = ''
+cmd = 'python3 main.py'
+input = 'input.txt'
+lang = 'PyPy3'
+file = 'main.py'
+
+[[preset]]
+name = 'py-without-pypy'
+init = ''
+build = ''
+cmd = 'python3 main.py'
+input = 'input.txt'
+lang = 'Python 3'
+file = 'main.py'
