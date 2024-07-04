@@ -8,16 +8,9 @@ class SegTree {
   i32 n;
   V tree;
   OP op;
-  T defaultvalue = T(0);
+  T defaultvalue;
 
   public:
-  SegTree(const V &a, const OP op): op(op) {
-    n = a.size();
-    tree = vector<T>(2*n);
-    for (i32 i=0; i<n; i++) tree[i+n] = a[i];
-    for (i32 i=n-1; i>0; i--) tree[i] = op(tree[i<<1], tree[i<<1|1]);
-  }
-
   SegTree(const V &a, const OP op, const T defaultvalue): op(op), defaultvalue(defaultvalue) {
     n = a.size();
     tree = vector<T>(2*n);
