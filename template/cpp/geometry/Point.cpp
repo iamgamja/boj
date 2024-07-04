@@ -14,4 +14,17 @@ class Point {
     os << "(" << p.x << ", " << p.y << ")";
     return os;
   }
+
+  Point& operator+(const Point& a, const Point& b) {
+    return Point(a.x+b.x,a.y+b.y);
+  }
+  Point& operator-(const Point& a, const Point& b) {
+    return Point(a.x-b.x,a.y-b.y);
+  }
+  i64 operator*(const Point& a, const Point& b) {
+    return (i64)a.x*b.x+(i64)a.y*b.y;
+  }
+  i64 operator/(const Point& a, const Point& b) {
+    return (i64)a.x*b.y-(i64)a.y*b.x;
+  }
 };
