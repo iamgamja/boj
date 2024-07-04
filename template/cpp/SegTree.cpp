@@ -8,9 +8,17 @@ class SegTree {
   i32 n;
   V tree;
   OP op;
+  T defaultvalue = T(0);
 
   public:
-  SegTree(const V &a, OP op): op(op) {
+  SegTree(const V &a, const OP op): op(op) {
+    n = a.size();
+    tree = vector<T>(2*n);
+    for (i32 i=0; i<n; i++) tree[i+n] = a[i];
+    for (i32 i=n-1; i>0; i--) tree[i] = op(tree[i<<1], tree[i<<1|1]);
+  }
+
+  SegTree(const V &a, const OP op, const T defaultvalue): op(op), defaultvalue(defaultvalue) {
     n = a.size();
     tree = vector<T>(2*n);
     for (i32 i=0; i<n; i++) tree[i+n] = a[i];
@@ -23,7 +31,7 @@ class SegTree {
   }
 
   T query(i32 l, i32 r) {
-    T res = 0; // 여기 기본값이 0이 아닐수도?
+    T res = defaultvalue;
     for (l+=n,r+=n+1; l<r; l>>=1,r>>=1) {
       if (l&1) res = op(res, tree[l++]);
       if (r&1) res = op(res, tree[--r]);
