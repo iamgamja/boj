@@ -32,4 +32,7 @@ class Point {
   auto operator<=>(const Point& o) const {
     return (x <=> o.x)!=0 ? (x <=> o.x) : (y <=> o.y);
   }
+  bool operator==(const Point& o) const {
+    return x == o.x && y == o.y;
+  }
 };
