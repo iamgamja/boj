@@ -28,4 +28,8 @@ class Point {
   i64 operator/(const Point& o) {
     return (i64)x*o.y - (i64)y*o.x;
   }
+
+  auto operator<=>(const Point& o) const {
+    return (x <=> o.x)!=0 ? (x <=> o.x) : (y <=> o.y);
+  }
 };
