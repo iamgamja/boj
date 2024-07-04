@@ -3,28 +3,29 @@ class Point {
   int x, y;
 
   Point(): x(0), y(0) {}
-  Point(int x, int y) : x(x), y(y) {}
+  Point(i32 x, i32 y) : x(x), y(y) {}
 
   friend istream& operator>>(istream& is, Point& p) {
-    is >> p.x >> p.y;
-    return is;
+    return is >> p.x >> p.y;
   }
 
   friend ostream& operator<<(ostream& os, const Point& p) {
-    os << "(" << p.x << ", " << p.y << ")";
-    return os;
+    return os << "(" << p.x << ", " << p.y << ")";
   }
 
-  Point& operator+(const Point& a, const Point& b) {
-    return Point(a.x+b.x,a.y+b.y);
+  Point operator+(const Point& o) const {
+    return Point(x+o.x, y+o.y);
   }
-  Point& operator-(const Point& a, const Point& b) {
-    return Point(a.x-b.x,a.y-b.y);
+  Point operator-(const Point& o) const {
+    return Point(x-o.x, y-o.y);
   }
-  i64 operator*(const Point& a, const Point& b) {
-    return (i64)a.x*b.x+(i64)a.y*b.y;
+  Point operator-() {
+    return Point(-x, -y);
   }
-  i64 operator/(const Point& a, const Point& b) {
-    return (i64)a.x*b.y-(i64)a.y*b.x;
+  i64 operator*(const Point& o) {
+    return (i64)x*o.x + (i64)y*o.y;
+  }
+  i64 operator/(const Point& o) {
+    return (i64)x*o.y - (i64)y*o.x;
   }
 };
