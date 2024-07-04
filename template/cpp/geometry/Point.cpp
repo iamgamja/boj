@@ -19,13 +19,13 @@ class Point {
   Point operator-(const Point& o) const {
     return Point(x-o.x, y-o.y);
   }
-  Point operator-() {
+  Point operator-() const {
     return Point(-x, -y);
   }
-  i64 operator*(const Point& o) {
+  i64 operator*(const Point& o) const {
     return (i64)x*o.x + (i64)y*o.y;
   }
-  i64 operator/(const Point& o) {
+  i64 operator/(const Point& o) const {
     return (i64)x*o.y - (i64)y*o.x;
   }
 
