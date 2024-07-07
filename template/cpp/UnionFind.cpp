@@ -1,17 +1,12 @@
-#ifndef mainfile
-#include <bits/stdc++.h>
-using namespace std;
-#endif
-
-class DisJointSet {
+class UnionFind {
   private:
-  const int none = -1;
+  const int none = INT_MIN;
   vector<int> nodes;
   vector<int> parent;
   vector<int> depth;
 
   public:
-  // [ {s}, {s+1}, ..., {e} ]
+  // [s, e]
   DisJointSet(int s, int e) {
     for (int i = 0; i < s; i++) { // index를 맞추기 위한
       nodes.push_back(none);
@@ -26,20 +21,18 @@ class DisJointSet {
     }
   }
 
-  // O(logN)
-  int getRoot(int target) {
+  int find(int target) {
     if (parent[target] == none)
       return target;
-    return parent[target] = getRoot(parent[target]);
+    return parent[target] = find(parent[target]);
   }
 
   // O(logN)
-  void connect(int a, int b) {
-    int ar = getRoot(a);
-    int br = getRoot(b);
+  void merge(int a, int b) {
+    int ar = find(a);
+    int br = find(b);
 
-    if (ar == br)
-      return; // 이미 같은 집합임
+    if (ar == br) return;
 
     if (depth[ar] > depth[br])
       parent[br] = ar; // a에 b 합치기
