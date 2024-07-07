@@ -1,6 +1,6 @@
 class Point {
   public:
-  int x, y;
+  i32 x, y;
 
   Point(): x(0), y(0) {}
   Point(i32 x, i32 y) : x(x), y(y) {}
@@ -30,7 +30,7 @@ class Point {
   }
 
   auto operator<=>(const Point& o) const {
-    return (x <=> o.x)!=0 ? (x <=> o.x) : (y <=> o.y);
+    return (x <=> o.x) != 0 ? (x <=> o.x) : (y <=> o.y);
   }
   bool operator==(const Point& o) const {
     return x == o.x && y == o.y;
