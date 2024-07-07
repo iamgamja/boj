@@ -5,3 +5,8 @@
 !.vscode/*.code-snippets
 
 main.exe
+
+
+# Added by cargo
+
+/target
