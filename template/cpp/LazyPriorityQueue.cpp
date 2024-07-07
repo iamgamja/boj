@@ -1,8 +1,3 @@
-#ifndef mainfile
-#include <bits/stdc++.h>
-using namespace std;
-#endif
-
 template <typename T, typename cmp = less<T>>
 class LazyPriorityQueue {
   private:
