@@ -1,9 +1,9 @@
 class Point {
   public:
-  i32 x, y;
+  i64 x, y;
 
   Point(): x(0), y(0) {}
-  Point(i32 x, i32 y) : x(x), y(y) {}
+  Point(i64 x, i64 y) : x(x), y(y) {}
 
   friend istream& operator>>(istream& is, Point& p) {
     return is >> p.x >> p.y;
@@ -23,10 +23,10 @@ class Point {
     return Point(-x, -y);
   }
   i64 operator*(const Point& o) const {
-    return (i64)x*o.x + (i64)y*o.y;
+    return x*o.x + y*o.y;
   }
   i64 operator/(const Point& o) const {
-    return (i64)x*o.y - (i64)y*o.x;
+    return x*o.y - y*o.x;
   }
 
   auto operator<=>(const Point& o) const {
