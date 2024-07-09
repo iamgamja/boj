@@ -1,111 +1,86 @@
-#ifndef mainfile
-#include <bits/stdc++.h>
-using namespace std;
-#endif
+/** 0-index */
+template <typename A, typename B>
+class SegTree {
+  using VA = vector<A>;
+  using VB = vector<B>;
+  using M = function<A(A,A)>;
+  using U = function<A(A,B)>;
+  using C = function<B(B,B)>;
 
-/**
- * tree[node]: a[s, e] 범위의 op 값
- * 쿼리 범위: [l, r]
- *
- * lazy[node]: tree[node]의 lazy값
- *
- * opop(a, b) = op(a, op(a, ...)) 를 b번 반복
- *
- * 1-index
- */
-#define op(a, b) ((a) + (b))
-#define opop(a, b) ((a) * (b))
-#define _default 0
-template <typename T>
-class LazySegmentTree {
   private:
-  vector<T> a;
   int n;
-  vector<T> lazy;
-  vector<T> tree;
+  VA tree;
+  VB lazy;
+  M M;
+  A dA;
+  U U;
+  B dB;
+  C C;
 
-  void _init(int node, int s, int e) {
-    if (s == e) {
-      tree[node] = a[s];
-    } else {
-      _init(node * 2, s, (s + e) / 2);
-      _init(node * 2 + 1, (s + e) / 2 + 1, e);
-      tree[node] = op(tree[node * 2], tree[node * 2 + 1]);
-    }
+  void apply(int i, B b) {
+    // i에 b를 업데이트
+    tree[i] = M(tree[i], b);
+    if (i<n) lazy[i] = C(lazy[i], b);
   }
 
-  T _query(int node, int s, int e, int l, int r) {
-    // update lazy
-    if (lazy[node] != _default) {
-      tree[node] = op(tree[node], opop(lazy[node], e - s + 1));
-      if (s != e) {
-        lazy[node * 2] = op(lazy[node * 2], lazy[node]);
-        lazy[node * 2 + 1] = op(lazy[node * 2 + 1], lazy[node]);
-      }
-      lazy[node] = _default;
-    }
-
-    // 범위를 벗어남
-    if (e < l || r < s)
-      return _default;
-
-    // 포함
-    if (l <= s && e <= r) {
-      return tree[node];
-    }
-
-    // 적당히 양쪽 계산 후 op
-    auto tmp1 = _query(node * 2, s, (s + e) / 2, l, r);
-    auto tmp2 = _query(node * 2 + 1, (s + e) / 2 + 1, e, l, r);
-    return op(tmp1, tmp2);
+  void push(int i) {
+    // i의 lazy를 자식에게 전파
+    apply(i<<1, lazy[i]);
+    apply(i<<1|1, lazy[i]);
+    lazy[i] = dB;
   }
 
-  void _update(int node, int s, int e, int i1, int i2, T diff) {
-    // update lazy
-    if (lazy[node] != _default) {
-      tree[node] = op(tree[node], opop(lazy[node], e - s + 1));
-      if (s != e) {
-        lazy[node * 2] = op(lazy[node * 2], lazy[node]);
-        lazy[node * 2 + 1] = op(lazy[node * 2 + 1], lazy[node]);
-      }
-      lazy[node] = _default;
+  void pull(int i) {
+    // i의 값을 자식으로부터 계산
+    tree[i] = M(tree[i<<1], tree[i<<1|1]);
+  }
+
+  void spread(int i) {
+    // i의 조상에 대해 pull↑, push↓
+    stack<int> s;
+    while (i) {
+      pull(i);
+      s.push(i);
+      i>>=1;
     }
-
-    // 범위를 벗어남
-    if (i2 < s || e < i1)
-      return;
-
-    // 포함
-    if (i1 <= s && e <= i2) {
-      tree[node] = op(tree[node], opop(diff, e - s + 1));
-      if (s != e) {
-        lazy[node * 2] = op(lazy[node * 2], diff);
-        lazy[node * 2 + 1] = op(lazy[node * 2 + 1], diff);
-      }
-      return;
+    while (!s.empty()) {
+      int now = s.top(); s.pop();
+      push(now);
     }
-
-    _update(node * 2, s, (s + e) / 2, i1, i2, diff);
-    _update(node * 2 + 1, (s + e) / 2 + 1, e, i1, i2, diff);
-    tree[node] = op(tree[node * 2], tree[node * 2 + 1]);
   }
 
   public:
-  // 1-index
-  LazySegmentTree(vector<T> &a_) {
-    a = a_;
-    n = a.size() - 1;
-    auto tree_size = 1 << ((int)ceill(log2l(n)) + 1); // 2 ^ ⌈ lg n ⌉
-    tree = vector<T>(tree_size, _default);
-    lazy = vector<T>(tree_size, _default); // init 0
-    _init(1, 1, n);
+  SegTree(const V &a, M M, A dA, U U, B dB, C C): M(M), dA(dA), U(U), dB(dB), C(C) {
+    n = a.size();
+    tree = VA(2*n);
+    lazy = VB(2*n, dB);
+    for (int i=0; i<n; i++) tree[i+n] = a[i];
+    for (int i=n-1; i>0; i--) tree[i] = M(tree[i<<1], tree[i<<1|1]);
   }
 
-  T query(int l, int r) {
-    return _query(1, 1, n, l, r);
+  // [l,r]
+  void update(int l, int r, T v) {
+    l += n; r += n;
+    spread(l); spread(r);
+
+    for (int L=l, R=r; L<=r; R>>=1,R>>=1) {
+      if (L&1) apply(L++, v);
+      if (~R&1) apply(R--, v);
+    }
+
+    spread(l); spread(r);
   }
 
-  void update(int i1, int i2, T diff) {
-    _update(1, 1, n, i1, i2, diff);
+  // [l,r]
+  A query(int l, int r) {
+    l += n; r += n;
+    spread(l); spread(r);
+
+    A res = dA;
+    for (; l<=r; l>>=1,r>>=1) {
+      if (l&1) res = M(res, tree[l++]);
+      if (~r&1) res = M(res, tree[--r]);
+    }
+    return res;
   }
 };
