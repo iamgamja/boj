@@ -1,6 +1,6 @@
 /** 0-index */
 template <typename A, typename B>
-class SegTree {
+class LazySegTree {
   using VA = vector<A>;
   using VB = vector<B>;
   using M = function<A(A,A)>;
