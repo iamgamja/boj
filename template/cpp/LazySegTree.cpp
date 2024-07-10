@@ -18,20 +18,20 @@ class LazySegTree {
   B dB;
   FC C;
 
-  void apply(int i, B b) {
+  void apply(const int i, const B b) {
     // i에 b를 업데이트
     tree[i] = U(tree[i], b);
     if (i<n) lazy[i] = C(lazy[i], b);
   }
 
-  void push(int i) {
+  void push(const int i) {
     // i의 lazy를 자식에게 전파
     apply(i<<1, lazy[i]);
     apply(i<<1|1, lazy[i]);
     lazy[i] = dB;
   }
 
-  void pull(int i) {
+  void pull(const int i) {
     // i의 값을 자식으로부터 계산
     tree[i] = M(tree[i<<1], tree[i<<1|1]);
   }
@@ -58,7 +58,7 @@ class LazySegTree {
   }
 
   public:
-  LazySegTree(const VA &a, FM M, A dA, FU U, B dB, FC C): M(M), dA(dA), U(U), dB(dB), C(C) {
+  LazySegTree(const VA &a, const FM M, const A dA, const FU U, const B dB, const FC C): M(M), dA(dA), U(U), dB(dB), C(C) {
     n = a.size();
     tree = VA(2*n);
     lazy = VB(2*n, dB);
@@ -67,12 +67,12 @@ class LazySegTree {
   }
 
   // [l,r]
-  void update(int l, int r, B v) {
+  void update(int l, int r, const B v) {
     l += n; r += n;
     calculateAncestorLazy(l);
     calculateAncestorLazy(r);
 
-    for (int L=l, R=r; L<=R; L>>=1,R>>=1) {
+    for (int L=l,R=r; L<=R; L>>=1,R>>=1) {
       if (L&1) apply(L++, v);
       if (~R&1) apply(R--, v);
     }
@@ -87,11 +87,11 @@ class LazySegTree {
     calculateAncestorLazy(l);
     calculateAncestorLazy(r);
 
-    A L = dA, R = dA;
-    for (; l<=r; l>>=1,r>>=1) {
-      if (l&1) L = M(L, tree[l++]);
-      if (~r&1) R = M(tree[r--], R);
+    A resL = dA, resR = dA;
+    for (int L=l,R=r; L<=R; L>>=1,R>>=1) {
+      if (L&1) resL = M(resL, tree[L++]);
+      if (~R&1) resR = M(tree[R--], resR);
     }
-    return M(L, R);
+    return M(resL, resR);
   }
 };
