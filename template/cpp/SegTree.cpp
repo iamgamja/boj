@@ -1,34 +1,35 @@
 /** 0-index */
-template <typename T>
+template <typename A>
 class SegTree {
-  using V = vector<T>;
-  using OP = function<T(T,T)>;
+  using VA = vector<A>;
+  using FM = function<A(A,A)>;
 
   private:
   int n;
-  V tree;
-  OP op;
-  T defaultvalue;
+  VA tree;
+  FM M;
+  A dA;
 
   public:
-  SegTree(const V &a, const OP op, const T defaultvalue): op(op), defaultvalue(defaultvalue) {
+  SegTree(const V &a, const FM M, const A dA): M(M), dA(dA) {
     n = a.size();
-    tree = vector<T>(2*n);
+    tree = VA(2*n);
     for (int i=0; i<n; i++) tree[i+n] = a[i];
-    for (int i=n-1; i>0; i--) tree[i] = op(tree[i<<1], tree[i<<1|1]);
+    for (int i=n-1; i>0; i--) tree[i] = M(tree[i<<1], tree[i<<1|1]);
   }
 
-  void update(int i, T v) {
+  void update(int i, A v) {
     for (tree[i+=n]=v; i>1; i>>=1)
-      tree[i>>1] = op(tree[i], tree[i^1]);
+      tree[i>>1] = M(tree[i], tree[i^1]);
   }
 
-  T query(int l, int r) {
-    T res = defaultvalue;
-    for (l+=n,r+=n+1; l<r; l>>=1,r>>=1) {
-      if (l&1) res = op(res, tree[l++]);
-      if (r&1) res = op(res, tree[--r]);
+  A query(int l, int r) {
+    l += n; r += n;
+    A resL = dA, resR = dA;
+    for (int L=l,R=r; L<=R; L>>=1,R>>=1) {
+      if (L&1) resL = M(resL, tree[L++]);
+      if (~R&1) resR = M(tree[R--], resR);
     }
-    return res;
+    return M(resL, resR);
   }
 };
