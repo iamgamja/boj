@@ -11,7 +11,7 @@ class SegTree {
   A dA;
 
   public:
-  SegTree(const V &a, const FM M, const A dA): M(M), dA(dA) {
+  SegTree(const VA &a, const FM M, const A dA): M(M), dA(dA) {
     n = a.size();
     tree = VA(2*n);
     for (int i=0; i<n; i++) tree[i+n] = a[i];
