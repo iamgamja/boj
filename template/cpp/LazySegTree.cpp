@@ -3,23 +3,24 @@ template <typename A, typename B>
 class LazySegTree {
   using VA = vector<A>;
   using VB = vector<B>;
-  using M = function<A(A,A)>;
-  using U = function<A(A,B)>;
-  using C = function<B(B,B)>;
+  using FM = function<A(A,A)>;
+  using FU = function<A(A,B)>;
+  using FC = function<B(B,B)>;
 
-  private:
+  // private:
+  public:
   int n;
   VA tree;
   VB lazy;
-  M M;
+  FM M;
   A dA;
-  U U;
+  FU U;
   B dB;
-  C C;
+  FC C;
 
   void apply(int i, B b) {
     // i에 b를 업데이트
-    tree[i] = M(tree[i], b);
+    tree[i] = U(tree[i], b);
     if (i<n) lazy[i] = C(lazy[i], b);
   }
 
@@ -35,13 +36,11 @@ class LazySegTree {
     tree[i] = M(tree[i<<1], tree[i<<1|1]);
   }
 
-  void spread(int i) {
-    // i의 조상에 대해 pull↑, push↓
+  void calculateAncestorLazy(int i) {
+    // i의 조상에 대해 push↓
     stack<int> s;
-    while (i) {
-      pull(i);
+    while (i>>=1) {
       s.push(i);
-      i>>=1;
     }
     while (!s.empty()) {
       int now = s.top(); s.pop();
@@ -49,38 +48,50 @@ class LazySegTree {
     }
   }
 
+  void calculateAncestorTree(int i) {
+    // i의 조상 중 이번에 수정되지 않은
+    // <=> lazy가 비어있는 노드에 대해 pull↑
+    while (i>>=1) {
+      if (lazy[i] == dB)
+        pull(i);
+    }
+  }
+
   public:
-  SegTree(const V &a, M M, A dA, U U, B dB, C C): M(M), dA(dA), U(U), dB(dB), C(C) {
+  LazySegTree(const VA &a, FM M, A dA, FU U, B dB, FC C): M(M), dA(dA), U(U), dB(dB), C(C) {
     n = a.size();
     tree = VA(2*n);
     lazy = VB(2*n, dB);
     for (int i=0; i<n; i++) tree[i+n] = a[i];
-    for (int i=n-1; i>0; i--) tree[i] = M(tree[i<<1], tree[i<<1|1]);
+    for (int i=n-1; i>0; i--) pull(i);
   }
 
   // [l,r]
-  void update(int l, int r, T v) {
+  void update(int l, int r, B v) {
     l += n; r += n;
-    spread(l); spread(r);
+    calculateAncestorLazy(l);
+    calculateAncestorLazy(r);
 
-    for (int L=l, R=r; L<=r; R>>=1,R>>=1) {
+    for (int L=l, R=r; L<=R; L>>=1,R>>=1) {
       if (L&1) apply(L++, v);
       if (~R&1) apply(R--, v);
     }
 
-    spread(l); spread(r);
+    calculateAncestorTree(l);
+    calculateAncestorTree(r);
   }
 
   // [l,r]
   A query(int l, int r) {
     l += n; r += n;
-    spread(l); spread(r);
+    calculateAncestorLazy(l);
+    calculateAncestorLazy(r);
 
-    A res = dA;
+    A L = dA, R = dA;
     for (; l<=r; l>>=1,r>>=1) {
-      if (l&1) res = M(res, tree[l++]);
-      if (~r&1) res = M(res, tree[--r]);
+      if (l&1) L = M(L, tree[l++]);
+      if (~r&1) R = M(tree[r--], R);
     }
-    return res;
+    return M(L, R);
   }
 };
