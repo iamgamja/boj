@@ -7,6 +7,17 @@ class FenwickTree {
   VA tree;
   int n;
 
+  /** [1, r] */
+  A prefixQuery(int i) {
+    i++; // 1-index
+    A res = A();
+    while (i) {
+      res += tree[i];
+      i -= i&-i;
+    }
+    return res;
+  }
+
   public:
   FenwickTree(const VA &a) {
     n = a.size();
@@ -24,19 +35,8 @@ class FenwickTree {
     }
   }
 
-  /** [1, r] */
-  A query(int i) {
-    i++; // 1-index
-    A res = A();
-    while (i) {
-      res += tree[i];
-      i -= i&-i;
-    }
-    return res;
-  }
-
   /** [l, r] */
   A query(int l, int r) {
-    return query(r) - query(l-1);
+    return prefixQuery(r) - prefixQuery(l-1);
   }
 };
