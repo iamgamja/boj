@@ -13,9 +13,7 @@ class LazySegTree {
   VA tree;
   VB lazy;
   FM M;
-  A dA;
   FU U;
-  B dB;
   FC C;
 
   void apply(const int i, const B b) {
@@ -28,7 +26,7 @@ class LazySegTree {
     // i의 lazy를 자식에게 전파
     apply(i<<1, lazy[i]);
     apply(i<<1|1, lazy[i]);
-    lazy[i] = dB;
+    lazy[i] = B();
   }
 
   void pull(const int i) {
@@ -52,16 +50,16 @@ class LazySegTree {
     // i의 조상 중 이번에 수정되지 않은
     // <=> lazy가 비어있는 노드에 대해 pull↑
     while (i>>=1) {
-      if (lazy[i] == dB)
+      if (lazy[i] == B())
         pull(i);
     }
   }
 
   public:
-  LazySegTree(const VA &a, const FM M, const A dA, const FU U, const B dB, const FC C): M(M), dA(dA), U(U), dB(dB), C(C) {
+  LazySegTree(const VA &a, const FM M, const FU U, const FC C): M(M), U(U), C(C) {
     n = a.size();
     tree = VA(2*n);
-    lazy = VB(2*n, dB);
+    lazy = VB(2*n, B());
     for (int i=0; i<n; i++) tree[i+n] = a[i];
     for (int i=n-1; i>0; i--) pull(i);
   }
@@ -87,7 +85,7 @@ class LazySegTree {
     calculateAncestorLazy(l);
     calculateAncestorLazy(r);
 
-    A resL = dA, resR = dA;
+    A resL = A(), resR = A();
     for (int L=l,R=r; L<=R; L>>=1,R>>=1) {
       if (L&1) resL = M(resL, tree[L++]);
       if (~R&1) resR = M(tree[R--], resR);
