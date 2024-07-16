@@ -18,6 +18,10 @@ class Node {
     return is;
   }
 
+  friend ostream& operator<<(ostream& os, Node& node) {
+    return os << "Node(" << node.left << ", " << node.right << ", " << node.res << ", " << node.sum << ")";
+  }
+
   Node operator+(Node o) {
     if (isI) return o;
     if (o.isI) return *this;
