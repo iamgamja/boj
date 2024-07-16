@@ -9,11 +9,10 @@ class SegTree2d {
   int Y, X;
   VVA tree;
   FM M;
-  A dA;
 
   A queryX(int y, int x1, int x2) {
     x1 += X; x2 += X;
-    A resL = dA, resR = dA;
+    A resL = A(), resR = A();
 
     for (int xL = x1, xR = x2; xL <= xR; xL >>= 1, xR >>= 1) {
       if (xL & 1) resL = M(resL, tree[y][xL++]);
@@ -23,7 +22,7 @@ class SegTree2d {
   }
 
   public:
-  SegTree2d(const VVA &a, const FM M, const A dA): M(M), dA(dA) {
+  SegTree2d(const VVA &a, const FM M): M(M) {
     Y = a.size();
     X = a[0].size();
     tree = VVA(2*Y, VA(2*X));
@@ -53,7 +52,7 @@ class SegTree2d {
 
   A query(int y1, int x1, int y2, int x2) {
     y1 += Y; y2 += Y;
-    A resL = dA, resR = dA;
+    A resL = A(), resR = A();
 
     for (int yL = y1, yR = y2; yL <= yR; yL >>= 1, yR >>= 1) {
       if (yL & 1) resL = M(resL, queryX(yL++, x1, x2));
