@@ -8,10 +8,9 @@ class SegTree {
   int n;
   VA tree;
   FM M;
-  A dA;
 
   public:
-  SegTree(const VA &a, const FM M, const A dA): M(M), dA(dA) {
+  SegTree(const VA &a, const FM M): M(M) {
     n = a.size();
     tree = VA(2*n);
     for (int i=0; i<n; i++) tree[i+n] = a[i];
@@ -25,7 +24,7 @@ class SegTree {
 
   A query(int l, int r) {
     l += n; r += n;
-    A resL = dA, resR = dA;
+    A resL = A(), resR = A();
     for (int L=l,R=r; L<=R; L>>=1,R>>=1) {
       if (L&1) resL = M(resL, tree[L++]);
       if (~R&1) resR = M(tree[R--], resR);
