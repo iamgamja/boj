@@ -4,6 +4,7 @@ class Node {
   i64 left, right, res, sum;
 
   Node(): isI(1), left(0), right(0), res(0), sum(0) {}
+  Node(i64 x) { set(x); }
   Node(i64 left, i64 right, i64 res, i64 sum): isI(0), left(left), right(right), res(res), sum(sum) {}
 
   void set(i64 x) {
