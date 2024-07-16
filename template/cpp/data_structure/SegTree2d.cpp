@@ -43,7 +43,7 @@ class SegTree2d {
 
     // 먼저 같은 y update
     for (int x=x_; x>1; x>>=1)
-      tree[y_][x>>1] = M(tree[y_][x], tree[y_][x^1]);
+      tree[y_][x>>1] = M(tree[y_][x>>1<<1], tree[y_][x>>1<<1|1]);
 
     // 이제 y 올라가면서 update
     for (int y=y_>>1; y; y>>=1)
