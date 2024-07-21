@@ -18,8 +18,8 @@ class SegTree {
   }
 
   void update(int i, A v) {
-    for (tree[i+=n]=v; i>1; i>>=1)
-      tree[i>>1] = M(tree[i>>1<<1], tree[i>>1<<1|1]);
+    for (tree[i+=n]=v, i>>=1; i; i>>=1)
+      tree[i] = M(tree[i<<1], tree[i<<1|1]);
   }
 
   A query(int l, int r) {
