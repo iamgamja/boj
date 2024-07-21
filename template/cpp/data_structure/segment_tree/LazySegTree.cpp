@@ -7,8 +7,7 @@ class LazySegTree {
   using FU = function<A(A,B)>;
   using FC = function<B(B,B)>;
 
-  // private:
-  public:
+  private:
   int n;
   VA tree;
   VB lazy;
@@ -29,11 +28,6 @@ class LazySegTree {
     lazy[i] = B();
   }
 
-  void pull(const int i) {
-    // i의 값을 자식으로부터 계산
-    tree[i] = M(tree[i<<1], tree[i<<1|1]);
-  }
-
   void calculateAncestorLazy(int i) {
     // i의 조상에 대해 push↓
     stack<int> s;
@@ -51,7 +45,7 @@ class LazySegTree {
     // <=> lazy가 비어있는 노드에 대해 pull↑
     while (i>>=1) {
       if (lazy[i] == B())
-        pull(i);
+        tree[i] = M(tree[i<<1], tree[i<<1|1]);
     }
   }
 
@@ -61,7 +55,7 @@ class LazySegTree {
     tree = VA(2*n);
     lazy = VB(2*n, B());
     for (int i=0; i<n; i++) tree[n+i] = a[i];
-    for (int i=n-1; i>0; i--) pull(i);
+    for (int i=n-1; i>0; i--) tree[i] = M(tree[i<<1], tree[i<<1|1]);
   }
 
   // [l,r]
