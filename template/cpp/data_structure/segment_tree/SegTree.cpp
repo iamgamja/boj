@@ -13,7 +13,7 @@ class SegTree {
   SegTree(const VA &a, const FM M): M(M) {
     n = a.size();
     tree = VA(2*n);
-    for (int i=0; i<n; i++) tree[i+n] = a[i];
+    for (int i=0; i<n; i++) tree[n+1] = a[i];
     for (int i=n-1; i>0; i--) tree[i] = M(tree[i<<1], tree[i<<1|1]);
   }
 
