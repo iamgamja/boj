@@ -60,7 +60,7 @@ class LazySegTree {
     n = a.size();
     tree = VA(2*n);
     lazy = VB(2*n, B());
-    for (int i=0; i<n; i++) tree[i+n] = a[i];
+    for (int i=0; i<n; i++) tree[n+i] = a[i];
     for (int i=n-1; i>0; i--) pull(i);
   }
 
