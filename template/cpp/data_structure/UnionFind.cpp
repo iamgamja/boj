@@ -7,7 +7,7 @@ class UnionFind {
 
   public:
   // [s, e]
-  DisJointSet(int s, int e) {
+  UnionFind(int s, int e) {
     for (int i = 0; i < s; i++) { // index를 맞추기 위한
       nodes.push_back(none);
       parent.push_back(none);
