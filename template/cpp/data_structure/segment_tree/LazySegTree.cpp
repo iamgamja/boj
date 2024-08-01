@@ -8,39 +8,39 @@ class LazySegTree {
   using FC = function<B(B,B)>;
 
   private:
-  int n;
+  i32 n;
   VA tree;
   VB lazy;
   FM M;
   FU U;
   FC C;
 
-  void apply(const int i, const B b) {
+  void apply(const i32 i, const B b) {
     // i에 b를 업데이트
     tree[i] = U(tree[i], b);
     if (i<n) lazy[i] = C(lazy[i], b);
   }
 
-  void push(const int i) {
+  void push(const i32 i) {
     // i의 lazy를 자식에게 전파
     apply(i<<1, lazy[i]);
     apply(i<<1|1, lazy[i]);
     lazy[i] = B();
   }
 
-  void calculateAncestorLazy(int i) {
+  void calculateAncestorLazy(i32 i) {
     // i의 조상에 대해 push↓
-    stack<int> s;
+    stack<i32> s;
     while (i>>=1) {
       s.push(i);
     }
     while (!s.empty()) {
-      int now = s.top(); s.pop();
+      i32 now = s.top(); s.pop();
       push(now);
     }
   }
 
-  void calculateAncestorTree(int i) {
+  void calculateAncestorTree(i32 i) {
     // i의 조상 중 이번에 수정되지 않은
     // <=> lazy가 비어있는 노드에 대해 pull↑
     while (i>>=1) {
@@ -54,17 +54,17 @@ class LazySegTree {
     n = a.size();
     tree = VA(2*n);
     lazy = VB(2*n, B());
-    for (int i=0; i<n; i++) tree[n+i] = a[i];
-    for (int i=n-1; i>0; i--) tree[i] = M(tree[i<<1], tree[i<<1|1]);
+    for (i32 i=0; i<n; i++) tree[n+i] = a[i];
+    for (i32 i=n-1; i>0; i--) tree[i] = M(tree[i<<1], tree[i<<1|1]);
   }
 
   // [l,r]
-  void update(int l, int r, const B v) {
+  void update(i32 l, i32 r, const B v) {
     l += n; r += n;
     calculateAncestorLazy(l);
     calculateAncestorLazy(r);
 
-    for (int L=l,R=r; L<=R; L>>=1,R>>=1) {
+    for (i32 L=l,R=r; L<=R; L>>=1,R>>=1) {
       if (L&1) apply(L++, v);
       if (~R&1) apply(R--, v);
     }
@@ -74,13 +74,13 @@ class LazySegTree {
   }
 
   // [l,r]
-  A query(int l, int r) {
+  A query(i32 l, i32 r) {
     l += n; r += n;
     calculateAncestorLazy(l);
     calculateAncestorLazy(r);
 
     A resL = A(), resR = A();
-    for (int L=l,R=r; L<=R; L>>=1,R>>=1) {
+    for (i32 L=l,R=r; L<=R; L>>=1,R>>=1) {
       if (L&1) resL = M(resL, tree[L++]);
       if (~R&1) resR = M(tree[R--], resR);
     }
