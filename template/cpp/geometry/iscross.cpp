@@ -1,4 +1,4 @@
-bool iscross(const Point& a1, const Point& a2, const Point& b1, const Point& b2) {
+bool iscross(const Point &a1, const Point &a2, const Point &b1, const Point &b2) {
   auto r1 = sccw(a1,a2,b1)*sccw(a1,a2,b2);
   auto r2 = sccw(b1,b2,a1)*sccw(b1,b2,a2);
   if (r1==0 && r2==0) {
@@ -11,7 +11,7 @@ bool iscross(const Point& a1, const Point& a2, const Point& b1, const Point& b2)
   return r1<=0 && r2<=0;
 }
 
-bool iscross_exclude_boundary(const Point& a1, const Point& a2, const Point& b1, const Point& b2) {
+bool iscross_exclude_boundary(const Point &a1, const Point &a2, const Point &b1, const Point &b2) {
   auto r1 = sccw(a1,a2,b1)*sccw(a1,a2,b2);
   auto r2 = sccw(b1,b2,a1)*sccw(b1,b2,a2);
   if (r1==0 && r2==0) {
