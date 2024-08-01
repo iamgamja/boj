@@ -8,7 +8,7 @@ class FenwickTree {
   int n;
 
   /** [1, r] */
-  A prefixQuery(int i) {
+  A prefixQuery(i32 i) {
     i++; // 1-index
     A res = A();
     while (i) {
@@ -22,11 +22,11 @@ class FenwickTree {
   FenwickTree(const VA &a) {
     n = a.size();
     tree = VA(n+1); // 1-index
-    for (int i=0; i<n; i++)
+    for (i32 i=0; i<n; i++)
       update(i, a[i]);
   }
 
-  void update(int i, A v) {
+  void update(i32 i, A v) {
     A diff = v - query(i,i);
     i++; // 1-index
     while (i<=n) {
@@ -36,7 +36,7 @@ class FenwickTree {
   }
 
   /** [l, r] */
-  A query(int l, int r) {
+  A query(i32 l, i32 r) {
     return prefixQuery(r) - prefixQuery(l-1);
   }
 };
