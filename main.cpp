@@ -9,6 +9,11 @@ using f64 = double;
 using f128 = long double;
 const i32 inf32 = 0x3f3f3f3f;
 const i64 inf64 = 0x3f3f3f3f3f3f3f3fLL;
+using pii = pair<i32,i32>;
+istream& operator>>(istream &is, pii &x) {
+  return is >> x.first >> x.second;
+}
+#define ALL(v) (v).begin(), (v).end()
 
 int main() {
   cin.tie(0)->sync_with_stdio(0);
