@@ -9,11 +9,11 @@ class FenwickTree2d {
   int Y;
   int X;
 
-  A prefixQuery(int y_, int x_) {
+  A prefixQuery(i32 y_, i32 x_) {
     y_++; x_++; // 1-index
     A res = A();
-    for (int y=y_; y; y-=y&-y)
-      for (int x=x_; x; x-=x&-x)
+    for (i32 y=y_; y; y-=y&-y)
+      for (i32 x=x_; x; x-=x&-x)
         res += tree[y][x];
     return res;
   }
@@ -23,20 +23,20 @@ class FenwickTree2d {
     Y = a.size();
     X = a[0].size();
     tree = VVA(Y+1, VA(X+1)); // 1-index
-    for (int y=0; y<Y; y++)
-      for (int x=0; x<X; x++)
+    for (i32 y=0; y<Y; y++)
+      for (i32 x=0; x<X; x++)
         update(y, x, a[y][x]);
   }
 
-  void update(int y_, int x_, A v) {
+  void update(i32 y_, i32 x_, A v) {
     A diff = v - query(y_,x_,y_,x_);
     y_++; x_++; // 1-index
-    for (int y=y_; y<=Y; y+=y&-y)
-      for (int x=x_; x<=X; x+=x&-x)
+    for (i32 y=y_; y<=Y; y+=y&-y)
+      for (i32 x=x_; x<=X; x+=x&-x)
         tree[y][x] += diff;
   }
 
-  A query(int y1, int x1, int y2, int x2) {
+  A query(i32 y1, i32 x1, i32 y2, i32 x2) {
     return prefixQuery(y2,x2) - prefixQuery(y2,x1-1) - prefixQuery(y1-1,x2) + prefixQuery(y1-1,x1-1);
   }
 };
