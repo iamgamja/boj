@@ -18,5 +18,4 @@ i32 main() {
   cin.tie(0)->sync_with_stdio(0);
 
   // code
-  for (i32 i=0; i<5; i++) cout << i << "\n";
 }
