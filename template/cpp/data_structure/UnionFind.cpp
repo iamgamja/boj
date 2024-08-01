@@ -4,11 +4,11 @@ class UnionFind {
   vector<i32> d;
 
   public:
-  // [0, e]
+  // [0, e)
   UnionFind(i32 e) {
-    p.resize(e+1);
-    d.resize(e+1);
-    for (i32 i = 0; i <= e; i++) {
+    p.resize(e);
+    d.resize(e);
+    for (i32 i = 0; i < e; i++) {
       p[i] = i;
       d[i] = 1;
     }
