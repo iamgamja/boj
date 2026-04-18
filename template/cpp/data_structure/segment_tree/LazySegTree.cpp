@@ -1,24 +1,27 @@
-/** 0-index */
+/**
+ * 0-index
+ * 
+ * requires class A, B:
+ * - A and B has default constructor that returns identity
+ * - A and B has operator== for identity check.
+ * - A.M(A): merge. if one of them is identity, return the other.
+ * - A.U(B): update. if B is identity, return self.
+ * - B.C(B): compose. if one of them is identity, return the other.
+ */
 template <typename A, typename B>
 class LazySegTree {
   using VA = vector<A>;
   using VB = vector<B>;
-  using FM = function<A(A,A)>;
-  using FU = function<A(A,B)>;
-  using FC = function<B(B,B)>;
 
   private:
   i32 n;
   VA tree;
   VB lazy;
-  FM M;
-  FU U;
-  FC C;
 
   void apply(const i32 i, const B b) {
     // i에 b를 업데이트
-    tree[i] = U(tree[i], b);
-    if (i<n) lazy[i] = C(lazy[i], b);
+    tree[i] = tree[i].U(b);
+    if (i<n) lazy[i] = lazy[i].C(b);
   }
 
   void push(const i32 i) {
@@ -45,17 +48,17 @@ class LazySegTree {
     // <=> lazy가 비어있는 노드에 대해 pull↑
     while (i>>=1) {
       if (lazy[i] == B())
-        tree[i] = M(tree[i<<1], tree[i<<1|1]);
+        tree[i] = tree[i<<1].M(tree[i<<1|1]);
     }
   }
 
   public:
-  LazySegTree(const VA &a, const FM M, const FU U, const FC C): M(M), U(U), C(C) {
+  LazySegTree(const VA &a) {
     n = a.size();
     tree = VA(2*n);
     lazy = VB(2*n, B());
     for (i32 i=0; i<n; i++) tree[n+i] = a[i];
-    for (i32 i=n-1; i>0; i--) tree[i] = M(tree[i<<1], tree[i<<1|1]);
+    for (i32 i=n-1; i>0; i--) tree[i] = tree[i<<1].M(tree[i<<1|1]);
   }
 
   // [l,r]
@@ -81,9 +84,9 @@ class LazySegTree {
 
     A resL = A(), resR = A();
     for (i32 L=l,R=r; L<=R; L>>=1,R>>=1) {
-      if (L&1) resL = M(resL, tree[L++]);
-      if (~R&1) resR = M(tree[R--], resR);
+      if (L&1) resL = resL.M(tree[L++]);
+      if (~R&1) resR = tree[R--].M(resR);
     }
-    return M(resL, resR);
+    return resL.M(resR);
   }
 };
