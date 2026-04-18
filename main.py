@@ -1,2 +1,10 @@
-import sys;from decimal import Decimal;from collections import deque,defaultdict;input=lambda:_[:-1]if (_:=sys.stdin.readline()).endswith('\n')else _;mi=lambda f=int:map(f,input().split());ii=lambda:int(input());iii=lambda n:[ii()for _ in range(n)]
+from collections import deque,defaultdict
+import os
+_nt=iter(os.read(0,os.fstat(0).st_size).split()).__next__
+tok=lambda:_nt().decode()
+def ii(N=-1):return int(tok())if N<0 else[ii()for _ in range(N)]
 
+def main():
+  pass
+
+main()
