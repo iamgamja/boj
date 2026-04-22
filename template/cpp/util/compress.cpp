@@ -1,3 +1,5 @@
+#include <../default.hpp>
+
 template<typename A>
 /** 좌표압축 */
 function<i32(A)> compress(vector<A> v) {

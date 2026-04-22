@@ -1,3 +1,5 @@
+#include <../default.hpp>
+
 class Node {
   public:
   bool isI;

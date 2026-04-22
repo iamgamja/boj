@@ -1,3 +1,5 @@
+#include <../default.hpp>
+
 class Point {
   public:
   i64 x, y;

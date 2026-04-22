@@ -1,3 +1,5 @@
+#include <../default.hpp>
+
 class UnionFind {
   private:
   vector<i32> p;

@@ -1,3 +1,5 @@
+#include <../default.hpp>
+
 i32 lis(vector<i32> &a) {
   vector<i32> M;
   for (auto x: a) {
