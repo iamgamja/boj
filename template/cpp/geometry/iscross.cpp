@@ -1,4 +1,4 @@
-#include <../default.hpp>
+#include "../default.hpp"
 
 bool iscross(const Point &a1, const Point &a2, const Point &b1, const Point &b2) {
   auto r1 = sccw(a1,a2,b1)*sccw(a1,a2,b2);

@@ -1,4 +1,4 @@
-#include <../default.hpp>
+#include "../default.hpp"
 
 template<typename A>
 /** 좌표압축 */

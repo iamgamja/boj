@@ -1,4 +1,4 @@
-#include <../default.hpp>
+#include "../default.hpp"
 
 template <typename T, typename cmp = less<T>>
 class LazyPriorityQueue {

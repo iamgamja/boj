@@ -1,4 +1,4 @@
-#include <../default.hpp>
+#include "../../default.hpp"
 
 /**
  * 0-index
@@ -68,3 +68,7 @@ class SegTree2d {
     return resL.M(resR);
   }
 };
+
+int main(){
+
+}

@@ -1,4 +1,4 @@
-#include <../default.hpp>
+#include "../default.hpp"
 
 template<int MOD>
 struct ModInt {

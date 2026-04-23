@@ -1,4 +1,4 @@
-#include <../default.hpp>
+#include "../default.hpp"
 
 VVI scc(const VVI &G, i32 V) {
   VVI revG(V);
