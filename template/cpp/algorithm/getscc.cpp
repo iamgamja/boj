@@ -1,6 +1,6 @@
 #include "../default.hpp"
 
-VVI scc(const VVI &G, i32 V) {
+VVI getscc(const VVI &G, i32 V) {
   VVI revG(V);
   for (i32 i=0; i<V; i++)
     for (i32 j: G[i])
