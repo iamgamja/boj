@@ -1,11 +1,9 @@
 *.tmp
 
 .cph
-.vscode/*
-!.vscode/*.code-snippets
 
 main.exe
-
+main
 
 # Added by cargo
 
