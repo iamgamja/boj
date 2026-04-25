@@ -1,6 +1,6 @@
 #include "../default.hpp"
 
-template<int MOD>
+template<i32 MOD>
 struct ModInt {
   i64 x;
   ModInt(i64 x = 0): x((x % MOD + MOD) % MOD) {}
