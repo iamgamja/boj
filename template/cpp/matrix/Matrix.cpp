@@ -55,15 +55,15 @@ struct Matrix {
     return res;
   }
 
-  Matrix pow(const Matrix &m, i64 power) const {
+  Matrix pow(i64 power) const {
     if (power == 0) {
-      Matrix res(m.R, m.C);
+      Matrix res(R, C);
       for (i32 i=0; i<res.R; i++) res[i][i] = 1;
       return res;
     }
 
-    auto h = pow(m, power/2);
-    if (power&1) return h*h*m;
+    auto h = this->pow(power/2);
+    if (power&1) return h*h*(*this);
     else return h*h;
   }
 
