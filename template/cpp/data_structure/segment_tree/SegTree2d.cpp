@@ -44,6 +44,9 @@ class SegTree2d {
   }
 
   void update(i32 y_, i32 x_, A v) {
+    assert(0 <= y_ && y_ < Y);
+    assert(0 <= x_ && x_ < X);
+
     tree[y_+=Y][x_+=X]=v;
 
     // 먼저 같은 y update
@@ -57,6 +60,9 @@ class SegTree2d {
   }
 
   A query(i32 y1, i32 x1, i32 y2, i32 x2) {
+    if (!(0 <= y1 && y1 <= y2 && y2 < Y)) return A();
+    if (!(0 <= x1 && x1 <= x2 && x2 < X)) return A();
+
     y1 += Y; y2 += Y;
     A resL = A(), resR = A();
 

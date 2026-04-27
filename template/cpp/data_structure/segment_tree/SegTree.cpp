@@ -24,11 +24,15 @@ class SegTree {
   }
 
   void update(i32 i, A v) {
+    assert(0 <= i && i < n);
+
     for (tree[i+=n]=v, i>>=1; i; i>>=1)
       tree[i] = tree[i<<1].M(tree[i<<1|1]);
   }
 
   A query(i32 l, i32 r) {
+    if (!(0 <= l && l <= r && r < n)) return A();
+    
     l += n; r += n;
     A resL = A(), resR = A();
     for (i32 L=l,R=r; L<=R; L>>=1,R>>=1) {

@@ -65,6 +65,8 @@ class LazySegTree {
 
   // [l,r]
   void update(i32 l, i32 r, const B v) {
+    assert(0 <= l && l <= r && r < n);
+    
     l += n; r += n;
     calculateAncestorLazy(l);
     calculateAncestorLazy(r);
@@ -80,6 +82,8 @@ class LazySegTree {
 
   // [l,r]
   A query(i32 l, i32 r) {
+    if (!(0 <= l && l <= r && r < n)) return A();
+    
     l += n; r += n;
     calculateAncestorLazy(l);
     calculateAncestorLazy(r);
