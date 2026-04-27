@@ -5,7 +5,7 @@
  * 
  * requires class A, B:
  * - A and B has default constructor that returns identity
- * - A and B has operator== for identity check.
+ * - B has operator== for identity check.
  * - A.M(A): merge. if one of them is identity, return the other.
  * - A.U(B): update. if B is identity, return self.
  * - B.C(B): compose. if one of them is identity, return the other.
