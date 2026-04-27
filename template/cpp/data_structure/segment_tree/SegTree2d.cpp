@@ -5,7 +5,6 @@
  * 
  * requires class A:
  * - A has default constructor that returns identity
- * - A has operator== for identity check.
  * - A.M(A): merge. if one of them is identity, return the other.
  */
 template <typename A>
@@ -68,7 +67,3 @@ class SegTree2d {
     return resL.M(resR);
   }
 };
-
-int main(){
-
-}
