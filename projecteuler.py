@@ -1,13 +1,17 @@
-from math import isqrt
+from math import isqrt, log
 from itertools import *
 from functools import *
 from collections import *
 import operator
 
-import os
-_nt = iter(os.read(0,os.fstat(0).st_size).split()).__next__
-def tok() -> str:
-  return _nt().decode()
+try: from tqdm import tqdm
+except: tqdm = lambda x, *args, **kargs: x
+
+def _gen_tokens():
+  while 1:
+    yield from input().split()
+_tokens = _gen_tokens()
+tok = _tokens.__next__
 def ii(*args) -> int | list:
   '''
   ii() -> int
@@ -108,6 +112,31 @@ class ITER:
   def islice(self, *args):
     return ITER(islice(self.it, *args))
 
+  def pairwise(self):
+    return ITER(pairwise(self.it))
+
+  def takewhile(self, predicate):
+    return ITER(takewhile(predicate, self.it))
+
+  def tee(self, n=2):
+    return tuple(ITER(it) for it in tee(self.it, n))
+
+  def copy(self):
+    self.it, it2 = self.tee()
+    return it2
+
+  def zip(self, *iterables):
+    return ITER(zip(self.it, *iterables))
+
+  def zip_longest(self, *iterables, fillvalue=None):
+    return ITER(zip_longest(self.it, *iterables, fillvalue=fillvalue))
+
+  def drop(self, n=1):
+    return self.islice(n, None)
+
+  def take(self, n=1):
+    return self.islice(n)
+  
   def __getitem__(self, key):
     if isinstance(key, slice):
       return self.islice(key.start, key.stop, key.step)
@@ -172,31 +201,6 @@ class ITER:
 
     self.it = _gen_deleter(self.it, key)
 
-  def pairwise(self):
-    return ITER(pairwise(self.it))
-
-  def takewhile(self, predicate):
-    return ITER(takewhile(predicate, self.it))
-
-  def tee(self, n=2):
-    return tuple(ITER(it) for it in tee(self.it, n))
-
-  def copy(self):
-    self.it, it2 = self.tee()
-    return it2
-
-  def zip(self, *iterables):
-    return ITER(zip(self.it, *iterables))
-
-  def zip_longest(self, *iterables, fillvalue=None):
-    return ITER(zip_longest(self.it, *iterables, fillvalue=fillvalue))
-
-  def drop(self, n=1):
-    return self.islice(n, None)
-
-  def take(self, n=1):
-    return self.islice(n)
-
   def len(self):
     return sum(1 for _ in self.it)
 
@@ -215,29 +219,35 @@ class ITER:
   def join(self, sep=''):
     return sep.join(map(str, self.it))
 
+  def sort(key=None):
+    return ITER(sorted(self.it, key=key))
+
+  def sorted(key=None):
+    return sorted(self.it, key=key)
+
+  def product(self, *iterables, repeat=None):
+    return ITER(product(self.it, *iterables, repeat=repeat))
+
+  def permutations(self, r=None):
+    return ITER(permutations(self.it, r))
+
+  def combinations(self, r):
+    return ITER(combinations(self.it, r))
+
+  def combinations_with_replacement(self, r):
+    return ITER(combinations_with_replacement(self.it, r))
+
   @staticmethod
   def range(*args):
     return ITER(range(*args))
 
   @staticmethod
+  def tqdm(*args, **kargs):
+    return ITER(tqdm(range(*args), **kargs))
+
+  @staticmethod
   def count(*args):
     return ITER(count(*args))
-
-  @staticmethod
-  def product(*iterables, repeat=1):
-    return ITER(product(*iterables, repeat=repeat))
-
-  @staticmethod
-  def permutations(iterable, r=None):
-    return ITER(permutations(iterable, r))
-
-  @staticmethod
-  def combinations(iterable, r):
-    return ITER(combinations(iterable, r))
-
-  @staticmethod
-  def combinations_with_replacement(iterable, r):
-    return ITER(combinations_with_replacement(iterable, r))
 
 def toBase(n: int, b: int) -> str:
   if n == 0: return '0'
@@ -253,6 +263,11 @@ def ispal(s: int | str) -> bool:
   s = str(s)
   return s == s[::-1]
 
+def issquare(n: int | str) -> bool:
+  n = int(n)
+  return isqrt(n)**2 == n
+
+'''
 def isprime(n: int | str) -> bool:
   n = int(n)
   if n <= 1: return False
@@ -260,10 +275,6 @@ def isprime(n: int | str) -> bool:
   for i in range(2, isqrt(n)+1):
     if n%i==0: return False
   return True
-
-def issquare(n: int | str) -> bool:
-  n = int(n)
-  return isqrt(n)**2 == n
 
 def factorize(n: int) -> Counter:
   res = Counter()
@@ -284,8 +295,11 @@ def countFactor(n: int) -> int:
     res *= v+1
 
   return res
+  
+def primeFactors(self, n):
+  return self.factorize(n).keys()
 
-def listFactor(n: int):
+def factors(n: int):
   fac = factorize(n)
   keys, values = list(fac.keys()), fac.values()
   L = len(keys)
@@ -294,12 +308,77 @@ def listFactor(n: int):
     yield reduce(operator.mul, starmap(operator.pow, zip(keys, it)), 1)
 
 def sumProperFactor(n: int) -> int:
-  return sum(listFactor(n)) - n
+  return sum(factors(n)) - n
+'''
+
+class Sieve:
+  def __init__(self, N):
+    self.p = [i for i in range(N+1)] # 최소 소인수
+    self.primes = []
+    
+    self.tau = [0]*(N+1) # τ, 약수의 개수
+    self.sigma = [0]*(N+1) # σ, 약수의 합
+    self.mu = [0]*(N+1) # μ, 뫼비우스 함수
+    self.phi = [0]*(N+1) # φ, n 미만의 n와 서로소인 정수 개수
+    self.c = [0]*(N+1) # n의 최소 소인수의 지수
+    self.tau[1] = self.sigma[1] = self.mu[1] = self.phi[1] = 1
+    
+    for i in tqdm(range(2, N+1), desc="Init Sieve"):
+      if self.p[i] == i:
+        self.primes.append(i)
+        
+        self.c[i] = 1
+        self.tau[i] = 2
+        self.sigma[i] = i+1
+        self.mu[i] = -1
+        self.phi[i] = i-1
+
+      for p in self.primes:
+        x = i*p
+        
+        if x > N: break
+        self.p[x] = p
+        if i % p == 0:
+          self.c[x] = self.c[i] + 1
+          self.tau[x] = self.tau[i] * (self.c[i]+2) // (self.c[i]+1)
+          self.sigma[x] = self.sigma[i] * (pow(p, self.c[i]+2) - 1) // (pow(p, self.c[i]+1) - 1)
+          self.mu[x] = 0
+          self.phi[x] = self.phi[i] * p
+          break
+        else:
+          self.c[x] = 1
+          self.tau[x] = self.tau[i] * self.tau[p]
+          self.sigma[x] = self.sigma[i] * self.sigma[p]
+          self.mu[x] = self.mu[i] * self.mu[p]
+          self.phi[x] = self.phi[i] * self.phi[p]
+
+  def isprime(self, n):
+    if n <= 1: return False
+    return self.p[n] == n
+
+  def factorize(self, n):
+    res = Counter()
+    while n > 1:
+      res[self.p[n]] += 1
+      n //= self.p[n]
+    return res
+    
+  def primeFactors(self, n):
+    return self.factorize(n).keys()
+    
+  def factors(self, n):
+    fac = self.factorize(n)
+    keys, values, items = list(fac.keys()), fac.values(), fac.items()
+    L = len(keys)
+
+    for it in product(*[range(v+1) for v in values]):
+      yield ITER(keys).zip(it).starmap(operator.pow).mul()
 
 class Tracker:
-  def __init__(self, f=lambda x:1, filter=lambda x:1):
+  def __init__(self, *, f=lambda x: x, filter=lambda x: True, debug=False):
     self.f = f
     self.filter = filter
+    self.debug = debug
 
     self.mx = -float('inf')
     self.mx_x = None
@@ -316,7 +395,7 @@ class Tracker:
 
     y = self.f(x)
 
-    print('!', x, y)
+    if self.debug: print('!', x, '->', y)
 
     if y > self.mx:
       self.mx_x, self.mx = x, y
@@ -343,7 +422,8 @@ class Tracker:
       f"cnt: {self.cnt}",
       f"sum: {self.sum}",
       f"mul: {self.mul}",
+      f"avg: {self.avg}",
     ])
 
-###################################
+###
 
