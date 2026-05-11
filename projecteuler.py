@@ -1,4 +1,6 @@
 from math import isqrt, log
+from decimal import Decimal
+from fractions import Fraction
 from itertools import *
 from functools import *
 from collections import *
@@ -379,16 +381,18 @@ class Tracker:
     self.f = f
     self.filter = filter
     self.debug = debug
+    self.can_calculate = True
 
-    self.mx = -float('inf')
+    self.mx = None
     self.mx_x = None
 
-    self.mn = float('inf')
+    self.mn = None
     self.mn_x = None
 
+    self.sum = None
+    self.mul = None
+    
     self.cnt = 0
-    self.sum = 0
-    self.mul = 1
 
   def update(self, x):
     if not self.filter(x): return
@@ -396,24 +400,29 @@ class Tracker:
     y = self.f(x)
 
     if self.debug: print('!', x, '->', y)
+    
+    self.cnt += 1
+    if self.cnt == 1:
+      self.mx_x, self.mx = x, y
+      self.mn_x, self.mn = x, y
+      self.can_calculate = isinstance(y, (int, float, Decimal, Fraction))
+      if self.can_calculate:
+        self.sum = y
+        self.mul = y
 
     if y > self.mx:
       self.mx_x, self.mx = x, y
     if y < self.mn:
       self.mn_x, self.mn = x, y
 
-    self.cnt += 1
-    self.sum += y
-    self.mul *= y
-    if abs(self.mul) > 2**100:
-      self.mul = float('inf') if self.mul > 0 else -float('inf')
+    if self.can_calculate:
+      self.sum += y
+      self.mul *= y
+      if self.mul > 2**100: self.mul = float('inf')
+      if self.mul < -2**100: self.mul = -float('inf')
 
   def updates(self, it):
     for x in it: self.update(x)
-
-  @property
-  def avg(self):
-    return self.sum / self.cnt if self.cnt > 0 else float('nan')
 
   def __str__(self):
     return '\n'.join([
@@ -422,7 +431,6 @@ class Tracker:
       f"cnt: {self.cnt}",
       f"sum: {self.sum}",
       f"mul: {self.mul}",
-      f"avg: {self.avg}",
     ])
 
 ###
