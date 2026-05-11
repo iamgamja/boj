@@ -261,6 +261,61 @@ def toBase(n: int, b: int) -> str:
 
   return ''.join(map(str, res[::-1]))
 
+def roman2int(s):
+  '''
+  https://projecteuler.net/about=roman_numerals
+  s는 valid여야 함.
+  '''
+  res = 0
+
+  if 'IV' in s: res += 4; s = s.replace('IV', '')
+  if 'IX' in s: res += 9; s = s.replace('IX', '')
+  if 'XL' in s: res += 40; s = s.replace('XL', '')
+  if 'XC' in s: res += 90; s = s.replace('XC', '')
+  if 'CD' in s: res += 400; s = s.replace('CD', '')
+  if 'CM' in s: res += 900; s = s.replace('CM', '')
+
+  CS = {
+    'I': 1,
+    'V': 5,
+    'X': 10,
+    'L': 50,
+    'C': 100,
+    'D': 500,
+    'M': 1000,
+  }
+  for c in CS:
+    res += s.count(c) * CS[c]
+
+  return res
+
+def int2roman(n):
+  '''
+  https://projecteuler.net/about=roman_numerals
+  valid하고 최소인 문자열 반환.
+  '''
+  res = ''
+  
+  x, n = divmod(n, 1000)
+  res += 'M' * x
+
+  x, n = divmod(n, 100)
+  if x == 9: res += 'CM'
+  elif x == 4: res += 'CD'
+  else: res += 'D' * (x//5) + 'C' * (x%5)
+
+  x, n = divmod(n, 10)
+  if x == 9: res += 'XC'
+  elif x == 4: res += 'XL'
+  else: res += 'L' * (x//5) + 'X' * (x%5)
+
+  x, n = divmod(n, 1)
+  if x == 9: res += 'IX'
+  elif x == 4: res += 'IV'
+  else: res += 'V' * (x//5) + 'I' * (x%5)
+
+  return res
+
 def ispal(s: int | str) -> bool:
   s = str(s)
   return s == s[::-1]
