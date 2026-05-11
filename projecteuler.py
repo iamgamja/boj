@@ -221,11 +221,11 @@ class ITER:
   def join(self, sep=''):
     return sep.join(map(str, self.it))
 
-  def sort(self, key=None):
-    return ITER(sorted(self.it, key=key))
+  def sort(self, key=None, reverse=False):
+    return ITER(sorted(self.it, key=key, reverse=reverse))
 
-  def sorted(self, key=None):
-    return sorted(self.it, key=key)
+  def sorted(self, key=None, reverse=False):
+    return sorted(self.it, key=key, reverse=reverse)
 
   def product(self, *iterables, repeat=None):
     return ITER(product(self.it, *iterables, repeat=repeat))
