@@ -4,7 +4,7 @@ from fractions import Fraction
 from itertools import *
 from functools import *
 from collections import *
-import operator
+import math, random, operator
 
 try: from tqdm import tqdm
 except: tqdm = lambda x, *args, **kargs: x
@@ -14,7 +14,7 @@ def _gen_tokens():
     yield from input().split()
 _tokens = _gen_tokens()
 tok = _tokens.__next__
-def ii(*args) -> int | list:
+def ii(*args):
   '''
   ii() -> int
   ii(N) -> list[int]
@@ -40,7 +40,7 @@ class ITER:
   def starmap(self, f):
     return ITER(starmap(f, self.it))
 
-  def filter(self, predicate):
+  def filter(self, predicate=None):
     return ITER(filter(predicate, self.it))
 
   def starfilter(self, predicate):
@@ -124,8 +124,8 @@ class ITER:
     return tuple(ITER(it) for it in tee(self.it, n))
 
   def copy(self):
-    self.it, it2 = self.tee()
-    return it2
+    self.it, it2 = tee(self.it)
+    return ITER(it2)
 
   def zip(self, *iterables):
     return ITER(zip(self.it, *iterables))
@@ -269,7 +269,6 @@ def issquare(n: int | str) -> bool:
   n = int(n)
   return isqrt(n)**2 == n
 
-'''
 def isprime(n: int | str) -> bool:
   n = int(n)
   if n <= 1: return False
@@ -311,7 +310,7 @@ def factors(n: int):
 
 def sumProperFactor(n: int) -> int:
   return sum(factors(n)) - n
-'''
+  
 
 class Sieve:
   def __init__(self, N):
@@ -375,6 +374,7 @@ class Sieve:
 
     for it in product(*[range(v+1) for v in values]):
       yield ITER(keys).zip(it).starmap(operator.pow).mul()
+
 
 class Tracker:
   def __init__(self, *, f=lambda x: x, filter=lambda x: True, debug=False):
