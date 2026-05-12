@@ -6,7 +6,7 @@ from functools import *
 from collections import *
 import math, random, operator
 
-try: from tqdm import tqdm
+try: from tqdm import tqdm, trange
 except: tqdm = lambda x, *args, **kargs: x
 
 def _gen_tokens():
