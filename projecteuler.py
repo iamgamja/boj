@@ -1,4 +1,4 @@
-from math import isqrt, log
+from math import isqrt, log, factorial, comb
 from decimal import Decimal
 from fractions import Fraction
 from itertools import *
@@ -22,6 +22,10 @@ def ii(*args):
   '''
   if len(args) == 0: return int(tok())
   return [ii(*args[1:]) for _ in range(args[0])]
+
+def zi(N, *args):
+  if len(args) == 0: return [0]*N
+  return [zi(*args) for _ in range(N)]
 
 
 class ITER:
@@ -209,6 +213,12 @@ class ITER:
   def reduce(self, f, init=None):
     return reduce(f, self.it, init)
 
+  def min(self, key=None):
+    return min(self.it, key=key)
+
+  def max(self, key=None):
+    return max(self.it, key=key)
+
   def sum(self):
     return sum(self.it)
 
@@ -250,6 +260,21 @@ class ITER:
   @staticmethod
   def count(*args):
     return ITER(count(*args))
+
+def dijk(G, start, *, N):
+  D = [float('inf')]*N
+  D[start] = 0
+
+  candidates = set(range(N))
+
+  while candidates:
+    now = ITER(candidates).min(key=lambda x: D[x])
+    candidates -= {now}
+
+    for nxt, w in G[now]:
+      D[nxt] = min(D[nxt], D[now] + w)
+
+  return D
 
 def toBase(n: int, b: int) -> str:
   if n == 0: return '0'
@@ -487,6 +512,9 @@ class Tracker:
       f"sum: {self.sum}",
       f"mul: {self.mul}",
     ])
+
+thousand = 1_000
+million = 1_000_000
 
 ###
 
