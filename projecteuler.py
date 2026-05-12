@@ -106,10 +106,13 @@ class ITER:
   def cycle(self):
     return ITER(cycle(self.it))
 
-  def dropwhile(self, predicate):
+  def dropwhile(self, predicate=lambda x: x):
     return ITER(dropwhile(predicate, self.it))
 
-  def filterfalse(self, predicate):
+  def dropwhilefalse(self, predicate=lambda x: x):
+    return ITER(dropwhile(lambda x: not predicate(x), self.it))
+
+  def filterfalse(self, predicate=None):
     return ITER(filterfalse(predicate, self.it))
 
   def groupby(self, key=None):
@@ -121,8 +124,11 @@ class ITER:
   def pairwise(self):
     return ITER(pairwise(self.it))
 
-  def takewhile(self, predicate):
+  def takewhile(self, predicate=lambda x: x):
     return ITER(takewhile(predicate, self.it))
+
+  def takewhilefalse(self, predicate=lambda x: x):
+    return ITER(takewhile(lambda x: not predicate(x), self.it))
 
   def tee(self, n=2):
     return tuple(ITER(it) for it in tee(self.it, n))
