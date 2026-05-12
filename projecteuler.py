@@ -1,13 +1,11 @@
-from math import isqrt, log, factorial, comb
+from math import isqrt, log, factorial, comb, gcd, lcm
 from decimal import Decimal
 from fractions import Fraction
 from itertools import *
 from functools import *
 from collections import *
 import math, random, operator
-
-try: from tqdm import tqdm, trange
-except: tqdm = lambda x, *args, **kargs: x
+from tqdm import tqdm, trange
 
 def _gen_tokens():
   while 1:
@@ -38,6 +36,20 @@ class ITER:
   def __next__(self):
     return next(self.it)
 
+
+  @staticmethod
+  def range(*args):
+    return ITER(range(*args))
+
+  @staticmethod
+  def tqdm(*args, **kargs):
+    return ITER(tqdm(range(*args), **kargs))
+
+  @staticmethod
+  def count(*args):
+    return ITER(count(*args))
+
+
   def map(self, f, *args):
     return ITER(map(f, self.it, *args))
 
@@ -50,27 +62,38 @@ class ITER:
   def starfilter(self, predicate):
     return ITER(filter(lambda x: predicate(*x), self.it))
 
-  def all(self, predicate=None):
-    if predicate is None:
-      return all(self.it)
-    return self.map(predicate).all()
+  def filterfalse(self, predicate=None):
+    return ITER(filterfalse(predicate, self.it))
 
-  def starall(self, predicate):
-    return self.starmap(predicate).all()
+  def compress(self, selectors):
+    return ITER(compress(self.it, selectors))
 
-  def any(self, predicate=None):
-    if predicate is None:
-      return any(self.it)
-    return self.map(predicate).any()
 
-  def starany(self, predicate):
-    return self.starmap(predicate).any()
+  def islice(self, *args):
+    return ITER(islice(self.it, *args))
+    
+  def drop(self, n=1):
+    return self.islice(n, None)
+    
+  def dropwhile(self, predicate=lambda x: x):
+    return ITER(dropwhile(predicate, self.it))
 
-  def accumulate(self, func=None, initial=None):
-    return ITER(accumulate(self.it, func, initial))
+  def dropwhilefalse(self, predicate=lambda x: x):
+    return ITER(dropwhile(lambda x: not predicate(x), self.it))
 
-  def batched(self, n, strict=False):
-    return ITER(batched(self.it, n, strict=strict))
+  def take(self, n=1):
+    return self.islice(n)
+    
+  def takewhile(self, predicate=lambda x: x):
+    return ITER(takewhile(predicate, self.it))
+
+  def takewhilefalse(self, predicate=lambda x: x):
+    return ITER(takewhile(lambda x: not predicate(x), self.it))
+
+  def __getitem__(self, key):
+    if isinstance(key, slice): return self.islice(key.start, key.stop, key.step)
+    else: return next(self.islice(key, key+1))
+
 
   def chain(self, *iterables):
     return ITER(chain(self.it, *iterables))
@@ -78,15 +101,34 @@ class ITER:
   def prechain(self, *iterables):
     return ITER(chain(*iterables, self.it))
 
+  def zip(self, *iterables):
+    return ITER(zip(self.it, *iterables))
+
+  def zip_longest(self, *iterables, fillvalue=None):
+    return ITER(zip_longest(self.it, *iterables, fillvalue=fillvalue))
+    
   def interleave(self, *iterables):
-    return ITER(chain.from_iterable(zip(self.it, *iterables)))
+    return self.zip(*iterables).flat()
 
   def interleave_longest(self, *iterables, fillvalue=None):
-    return ITER(chain.from_iterable(zip_longest(self.it, *iterables, fillvalue=fillvalue)))
+    return self.zip_longest(*iterables, fillvalue=fillvalue).flat()
+
 
   def flat(self):
     return ITER(chain.from_iterable(self.it))
 
+  def accumulate(self, func=None, initial=None):
+    return ITER(accumulate(self.it, func, initial))
+
+  def batched(self, n, strict=False):
+    return ITER(batched(self.it, n, strict=strict))
+    
+  def groupby(self, key=None):
+    return ITER(groupby(self.it, key))
+
+  def pairwise(self):
+    return ITER(pairwise(self.it))
+    
   def windows(self, n):
     def _gen(it):
       window = deque(maxlen=n)
@@ -99,36 +141,9 @@ class ITER:
         yield tuple(window)
 
     return ITER(_gen(self.it))
-
-  def compress(self, selectors):
-    return ITER(compress(self.it, selectors))
-
+    
   def cycle(self):
     return ITER(cycle(self.it))
-
-  def dropwhile(self, predicate=lambda x: x):
-    return ITER(dropwhile(predicate, self.it))
-
-  def dropwhilefalse(self, predicate=lambda x: x):
-    return ITER(dropwhile(lambda x: not predicate(x), self.it))
-
-  def filterfalse(self, predicate=None):
-    return ITER(filterfalse(predicate, self.it))
-
-  def groupby(self, key=None):
-    return ITER(groupby(self.it, key))
-
-  def islice(self, *args):
-    return ITER(islice(self.it, *args))
-
-  def pairwise(self):
-    return ITER(pairwise(self.it))
-
-  def takewhile(self, predicate=lambda x: x):
-    return ITER(takewhile(predicate, self.it))
-
-  def takewhilefalse(self, predicate=lambda x: x):
-    return ITER(takewhile(lambda x: not predicate(x), self.it))
 
   def tee(self, n=2):
     return tuple(ITER(it) for it in tee(self.it, n))
@@ -137,81 +152,43 @@ class ITER:
     self.it, it2 = tee(self.it)
     return ITER(it2)
 
-  def zip(self, *iterables):
-    return ITER(zip(self.it, *iterables))
 
-  def zip_longest(self, *iterables, fillvalue=None):
-    return ITER(zip_longest(self.it, *iterables, fillvalue=fillvalue))
+  def sort(self, key=None, reverse=False):
+    return ITER(sorted(self.it, key=key, reverse=reverse))
 
-  def drop(self, n=1):
-    return self.islice(n, None)
+  def sorted(self, key=None, reverse=False):
+    return sorted(self.it, key=key, reverse=reverse)
 
-  def take(self, n=1):
-    return self.islice(n)
-  
-  def __getitem__(self, key):
-    if isinstance(key, slice):
-      return self.islice(key.start, key.stop, key.step)
-    else:
-      return next(self.islice(key, key+1))
+  def reverse(self):
+    return ITER(reversed(self.it))
+    
+  def reversed(self):
+    return reversed(self.it)
 
-  def __setitem__(self, key, value):
-    def _gen_updater(old_it, key, replacement):
-      if isinstance(key, slice):
-        start, stop, step = key.start or 0, key.stop, key.step or 1
-        if step != 1:
-          raise ValueError("Extended slices with step != 1 are not supported for assignment")
-          
-        for _ in range(start):
-          yield next(old_it)
-        
-        yield from replacement
-        
-        if stop is not None:
-          for _ in range(max(0, stop - start)):
-            try: next(old_it)
-            except StopIteration: break
-        
-        yield from old_it
-      else:
-        for _ in range(key):
-          yield next(old_it)
-          
-        yield replacement
-          
-        try: next(old_it)
-        except StopIteration: pass
-              
-        yield from old_it
+  def product(self, *iterables, repeat=None):
+    return ITER(product(self.it, *iterables, repeat=repeat))
 
-    self.it = _gen_updater(self.it, key, value)
+  def permutations(self, r=None):
+    return ITER(permutations(self.it, r))
 
-  def __delitem__(self, key):
-    def _gen_deleter(old_it, key):
-      if isinstance(key, slice):
-        start, stop, step = key.start or 0, key.stop, key.step or 1
-        if step != 1:
-          raise ValueError("Extended slices with step != 1 are not supported for deletion")
-          
-        for _ in range(start):
-          yield next(old_it)
-        
-        if stop is not None:
-          for _ in range(max(0, stop - start)):
-            try: next(old_it)
-            except StopIteration: break
-        
-        yield from old_it
-      else:
-        for _ in range(key):
-          yield next(old_it)
-          
-        try: next(old_it)
-        except StopIteration: pass
-              
-        yield from old_it
+  def combinations(self, r):
+    return ITER(combinations(self.it, r))
 
-    self.it = _gen_deleter(self.it, key)
+  def combinations_with_replacement(self, r):
+    return ITER(combinations_with_replacement(self.it, r))
+
+
+  def all(self, predicate=lambda x: x):
+    return all(self.map(predicate))
+
+  def starall(self, predicate):
+    return all(starmap(predicate))
+
+  def any(self, predicate=lambda x: x):
+    return any(self.map(predicate))
+
+  def starany(self, predicate):
+    return any(starmap(predicate))
 
   def len(self):
     return sum(1 for _ in self.it)
@@ -237,35 +214,6 @@ class ITER:
   def join(self, sep=''):
     return sep.join(map(str, self.it))
 
-  def sort(self, key=None, reverse=False):
-    return ITER(sorted(self.it, key=key, reverse=reverse))
-
-  def sorted(self, key=None, reverse=False):
-    return sorted(self.it, key=key, reverse=reverse)
-
-  def product(self, *iterables, repeat=None):
-    return ITER(product(self.it, *iterables, repeat=repeat))
-
-  def permutations(self, r=None):
-    return ITER(permutations(self.it, r))
-
-  def combinations(self, r):
-    return ITER(combinations(self.it, r))
-
-  def combinations_with_replacement(self, r):
-    return ITER(combinations_with_replacement(self.it, r))
-
-  @staticmethod
-  def range(*args):
-    return ITER(range(*args))
-
-  @staticmethod
-  def tqdm(*args, **kargs):
-    return ITER(tqdm(range(*args), **kargs))
-
-  @staticmethod
-  def count(*args):
-    return ITER(count(*args))
 
 def dijk(G, start, *, N):
   D = [float('inf')]*N
@@ -290,7 +238,7 @@ def toBase(n: int, b: int) -> str:
     n, m = divmod(n, b)
     res.append(m)
 
-  return ''.join(map(str, res[::-1]))
+  return ITER(res[::-1]).join()
 
 def roman2int(s):
   '''
@@ -458,8 +406,8 @@ class Sieve:
     keys, values, items = list(fac.keys()), fac.values(), fac.items()
     L = len(keys)
 
-    for it in product(*[range(v+1) for v in values]):
-      yield ITER(keys).zip(it).starmap(operator.pow).mul()
+    for tp in ITER(values).map(lambda v: range(v+1)).product():
+      yield ITER(keys).zip(tp).starmap(operator.pow).mul()
 
 
 class Tracker:
@@ -504,6 +452,8 @@ class Tracker:
     if self.can_calculate:
       self.sum += y
       self.mul *= y
+      if self.sum > 2**100: self.sum = float('inf')
+      if self.sum < -2**100: self.sum = -float('inf')
       if self.mul > 2**100: self.mul = float('inf')
       if self.mul < -2**100: self.mul = -float('inf')
 
