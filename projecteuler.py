@@ -160,10 +160,10 @@ class ITER:
     return sorted(self.it, key=key, reverse=reverse)
 
   def reverse(self):
-    return ITER(reversed(self.it))
+    return ITER(self.collect()[::-1])
     
   def reversed(self):
-    return reversed(self.it)
+    return self.collect()[::-1]
 
   def product(self, *iterables, repeat=None):
     return ITER(product(self.it, *iterables, repeat=repeat))
@@ -292,6 +292,53 @@ def int2roman(n):
   if x == 9: res += 'IX'
   elif x == 4: res += 'IV'
   else: res += 'V' * (x//5) + 'I' * (x%5)
+
+  return res
+
+def sqrt_to_continued_fraction(n):
+  d = isqrt(n) # sqrt(n)의 정수 부분
+  if issquare(n): return ITER([d])
+
+  res = [d]
+  a, b, c = 1, -d, 1 # (a sqrt(n) + b) / c
+  h = [(a,b,c)]
+
+  while 1:
+    # 역수를 취하면
+    # c / (a sqrt(n) + b)
+    # c (a sqrt(n) - b) / (a^2 n - b^2)
+    # (ac sqrt(n) - bc) / (a^2 n - b^2)
+    a, b, c = a*c, -b*c, a**2*n-b**2
+
+    # (a sqrt(n) + b) / c 에서 정수부분 분리
+    # d < sqrt(n) < d+1
+    # ad+b < a sqrt(n) + b < ad+a+b
+    # (ad+b) / c < (a sqrt(n) + b) / c < (ad+a+b) / c
+
+    # ((a*d+b)//c)만큼 분리 (=:k)
+    # (a sqrt(n)+b) / c - k
+    # = (a sqrt(n) + b - ck) / c
+    k = (a*d+b) // c
+    res.append(k)
+    b -= c * k
+
+    g = gcd(a,b,c)
+    a//=g; b//=g; c//=g
+
+    if (a,b,c) in h:
+      idx = h.index((a,b,c))
+      # 주기 = len(h) - idx
+
+      left, right = ITER(res[:idx+1]), ITER(res[idx+1:])
+      return left.chain(right.cycle())
+
+    h.append((a,b,c))
+
+def continued_fraction_to_fraction(it, n):
+  it = it.take(n).reverse()
+
+  res = Fraction(next(it))
+  for a in it: res = a + 1/res
 
   return res
 
