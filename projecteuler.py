@@ -71,9 +71,13 @@ class ITER:
 
   def islice(self, *args):
     return ITER(islice(self.it, *args))
+
+  def __getitem__(self, key):
+    if isinstance(key, slice): return self.islice(key.start, key.stop, key.step)
+    else: return next(self.islice(key, key+1))
     
   def drop(self, n=1):
-    return self.islice(n, None)
+    return self[n:]
     
   def dropwhile(self, predicate=lambda x: x):
     return ITER(dropwhile(predicate, self.it))
@@ -82,7 +86,7 @@ class ITER:
     return ITER(dropwhile(lambda x: not predicate(x), self.it))
 
   def take(self, n=1):
-    return self.islice(n)
+    return self[:n]
     
   def takewhile(self, predicate=lambda x: x):
     return ITER(takewhile(predicate, self.it))
@@ -90,16 +94,18 @@ class ITER:
   def takewhilefalse(self, predicate=lambda x: x):
     return ITER(takewhile(lambda x: not predicate(x), self.it))
 
-  def __getitem__(self, key):
-    if isinstance(key, slice): return self.islice(key.start, key.stop, key.step)
-    else: return next(self.islice(key, key+1))
-
 
   def chain(self, *iterables):
     return ITER(chain(self.it, *iterables))
 
   def prechain(self, *iterables):
     return ITER(chain(*iterables, self.it))
+
+  def append(self, x):
+    return self.chain([x])
+
+  def prepend(self, x):
+    return self.prechain([x])
 
   def zip(self, *iterables):
     return ITER(zip(self.it, *iterables))
@@ -120,6 +126,9 @@ class ITER:
   def accumulate(self, func=None, initial=None):
     return ITER(accumulate(self.it, func, initial))
 
+  def presum(self):
+    return self.accumulate()
+
   def batched(self, n, strict=False):
     return ITER(batched(self.it, n, strict=strict))
     
@@ -128,7 +137,15 @@ class ITER:
 
   def pairwise(self):
     return ITER(pairwise(self.it))
-    
+
+  def pairwise_loop(self):
+    first = next(self.it)
+    return (self
+      .prepend(first)
+      .append(first)
+      .pairwise()
+    )
+
   def windows(self, n):
     def _gen(it):
       window = deque(maxlen=n)
@@ -182,13 +199,13 @@ class ITER:
     return all(self.map(predicate))
 
   def starall(self, predicate):
-    return all(starmap(predicate))
+    return all(self.starmap(predicate))
 
   def any(self, predicate=lambda x: x):
     return any(self.map(predicate))
 
   def starany(self, predicate):
-    return any(starmap(predicate))
+    return any(self.starmap(predicate))
 
   def len(self):
     return sum(1 for _ in self.it)
@@ -214,6 +231,7 @@ class ITER:
   def join(self, sep=''):
     return sep.join(map(str, self.it))
 
+
 @total_ordering
 class Point:
   INF = 1<<128
@@ -221,11 +239,8 @@ class Point:
     self.x = x
     self.y = y
 
-  def __str__(self):
-    return f"({self.x}, {self.y})"
-
   def __repr__(self):
-    return str(self)
+    return f"(x={self.x}, y={self.y})"
 
   
   def normalize(self):
@@ -296,10 +311,13 @@ class Point:
 
 class Line:
   def __init__(self, p: Point, d: Point): self.p = p; self.d = d.normalize()
+  def __repl__(self): return f"Line(p={self.p}, d={self.d})"
 class Ray:
   def __init__(self, p: Point, d: Point): self.p = p; self.d = d.normalize()
+  def __repl__(self): return f"Ray(p={self.p}, d={self.d})"
 class Segment:
   def __init__(self, p: Point, q: Point): self.p = p; self.q = q; self.d = q - p
+  def __repl__(self): return f"Segment(p={self.p}, q={self.q})"
 
 def sign(n):
   return (n > 0) - (n < 0)
@@ -342,13 +360,10 @@ def intersects(A, B, inclusive=True):
   r1 = sccw(a1, a2, b1) * sccw(a1, a2, b2)
   r2 = sccw(b1, b2, a1) * sccw(b1, b2, a2)
     
-  if r1 == 0 and r2 == 0:
-    # 일직선이거나 한 점을 공유
-    if A.d.cross(B.d) != 0:
-      # 한 점 공유
+  if r1 == 0 and r2 == 0: # 일직선이거나 한 점을 공유
+    if A.d.cross(B.d) != 0: # 한 점 공유
       return inclusive
-    else:
-      # 일직선
+    else: # 일직선
       if inclusive:
         return not (max(a1, a2) < min(b1, b2) or max(b1, b2) < min(a1, a2))
       else:
