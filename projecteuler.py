@@ -230,6 +230,26 @@ def dijk(G, start, *, N):
 
   return D
 
+def gen_pythagorean_triple(N):
+  '''
+  find all (a,b,c) where a < b < c <= N
+  '''
+  # N >= c = m²+n² > m²
+  for m in trange(2, isqrt(N)+1, desc='gen_pythagorean_triple'):
+    # 0 < n < m
+    # m, n은 홀짝 다름
+    for n in range(2 if m&1 else 1, m, 2):
+      # n, m은 서로소
+      if gcd(n, m) != 1: continue
+
+      a = m**2 - n**2
+      b = 2 * m * n
+      c = m**2 + n**2
+      a, b = sorted([a,b])
+
+      for k in ITER.count(1).takewhile(lambda k: k*c<=N):
+        yield (k*a, k*b, k*c)
+
 def toBase(n: int, b: int) -> str:
   if n == 0: return '0'
 
