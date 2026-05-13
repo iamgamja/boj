@@ -638,9 +638,10 @@ class Sieve:
 
 
 class Tracker:
-  def __init__(self, *, f=lambda x: x, filter=lambda x: True, debug=False):
+  def __init__(self, *, f=lambda x: x, checker=lambda x: True, checkery=lambda y: True, debug=False):
     self.f = f
-    self.filter = filter
+    self.checker = checker
+    self.checkery = checkery
     self.debug = debug
     self.can_calculate = True
 
@@ -656,9 +657,10 @@ class Tracker:
     self.cnt = 0
 
   def update(self, x):
-    if not self.filter(x): return
+    if not self.checker(x): return
 
     y = self.f(x)
+    if not self.checkery(y): return
 
     if self.debug: print('!', x, '->', y)
     
