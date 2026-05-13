@@ -124,7 +124,7 @@ class ITER:
     return ITER(chain.from_iterable(self.it))
 
   def accumulate(self, func=None, initial=None):
-    return ITER(accumulate(self.it, func, initial))
+    return ITER(accumulate(self.it, func, initial=initial))
 
   def presum(self):
     return self.accumulate()
@@ -513,6 +513,19 @@ def sqrt_to_continued_fraction(n):
       return left.chain(right.cycle())
 
     h.append((a,b,c))
+
+@cache
+def partition_number(n, mod=None):
+  ''' 분할수 '''
+  if n < 0: return 0
+  if n == 0: return 1
+
+  res = 0
+  for k in count(1):
+    if n - k*(3*k-1)//2 < 0: break
+    res += (-1)**(k+1&1) * ( partition_number(n - k*(3*k+1)//2) + partition_number(n - k*(3*k-1)//2) )
+    if mod: res %= mod
+  return res
 
 def continued_fraction_to_fraction(it, n):
   it = it.take(n).reverse()
