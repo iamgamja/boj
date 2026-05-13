@@ -214,6 +214,151 @@ class ITER:
   def join(self, sep=''):
     return sep.join(map(str, self.it))
 
+@total_ordering
+class Point:
+  INF = 1<<128
+  def __init__(self, x=0, y=0):
+    self.x = x
+    self.y = y
+
+  def __str__(self):
+    return f"({self.x}, {self.y})"
+
+  def __repr__(self):
+    return str(self)
+
+  
+  def normalize(self):
+    g = gcd(self.x, self.y)
+    return self // g if g else Point()
+  
+
+  def __add__(self, other):
+    return Point(self.x + other.x, self.y + other.y)
+
+  def __sub__(self, other):
+    return Point(self.x - other.x, self.y - other.y)
+
+  def __neg__(self):
+    return Point(-self.x, -self.y)
+
+  def __mul__(self, other):
+    return Point(self.x * other, self.y * other)
+
+  def __truediv__(self, other):
+    return Point(self.x / other, self.y / other)
+
+  def __floordiv__(self, other):
+    return Point(self.x // other, self.y // other)
+
+
+  def __iadd__(self, other):
+    self.x += other.x
+    self.y += other.y
+    return self
+
+  def __isub__(self, other):
+    self.x -= other.x
+    self.y -= other.y
+    return self
+
+  def __imul__(self, other):
+    self.x *= other
+    self.y *= other
+    return self
+    
+  def __itruediv__(self, other):
+    self.x /= other
+    self.y /= other
+    return self
+
+  def __ifloordiv__(self, other):
+    self.x //= other
+    self.y //= other
+    return self
+
+
+  def dot(self, other):
+    return self.x * other.x + self.y * other.y
+    
+  def cross(self, other):
+    return self.x * other.y - self.y * other.x
+
+
+  def __eq__(self, other):
+    if not isinstance(other, Point): return False
+    return self.x == other.x and self.y == other.y
+
+  def __lt__(self, other):
+    if self.x != other.x:
+      return self.x < other.x
+    return self.y < other.y
+
+class Line:
+  def __init__(self, p: Point, d: Point): self.p = p; self.d = d.normalize()
+class Ray:
+  def __init__(self, p: Point, d: Point): self.p = p; self.d = d.normalize()
+class Segment:
+  def __init__(self, p: Point, q: Point): self.p = p; self.q = q; self.d = q - p
+
+def sign(n):
+  return (n > 0) - (n < 0)
+
+def ccw(a: Point, b: Point, c: Point):
+  return (b - a).cross(c - a)
+
+def sccw(a: Point, b: Point, c: Point):
+  return sign(ccw(a, b, c))
+  
+def intersects(A, B, inclusive=True):
+  '''
+  A, B must be Point, Line, Ray, Segment.
+  inclusive는 Point에서 무시됨.
+  '''
+  if isinstance(A, Ray):
+    A = Segment(A.p, A.p + A.d * Point.INF)
+  elif isinstance(A, Line):
+    A = Segment(A.p - A.d * Point.INF, A.p + A.d * Point.INF)
+  if isinstance(B, Ray):
+    B = Segment(B.p, B.p + B.d * Point.INF)
+  elif isinstance(B, Line):
+    B = Segment(B.p - B.d * Point.INF, B.p + B.d * Point.INF)
+
+  if isinstance(A, Point):
+    if isinstance(B, Point): return A == B
+
+    p, q = B.p, B.q
+    # A가 선분 pq 위에 있는지 확인
+    if ccw(p, q, A) != 0: return False
+    if inclusive:
+      return min(p, q) <= A <= max(p, q)
+    else:
+      return min(p, q) < A < max(p, q)
+  if isinstance(B, Point):
+    return intersects(B, A, inclusive)
+
+  # A,B is Segment
+  a1, a2, b1, b2 = A.p, A.q, B.p, B.q
+  r1 = sccw(a1, a2, b1) * sccw(a1, a2, b2)
+  r2 = sccw(b1, b2, a1) * sccw(b1, b2, a2)
+    
+  if r1 == 0 and r2 == 0:
+    # 일직선이거나 한 점을 공유
+    if A.d.cross(B.d) != 0:
+      # 한 점 공유
+      return inclusive
+    else:
+      # 일직선
+      if inclusive:
+        return not (max(a1, a2) < min(b1, b2) or max(b1, b2) < min(a1, a2))
+      else:
+        return not (max(a1, a2) <= min(b1, b2) or max(b1, b2) <= min(a1, a2))
+  
+  if inclusive:
+    return r1 <= 0 and r2 <= 0
+  else:
+    return r1 < 0 and r2 < 0
+
 
 def dijk(G, start, *, N):
   D = [float('inf')]*N
