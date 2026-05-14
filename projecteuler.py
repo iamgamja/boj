@@ -182,7 +182,7 @@ class ITER:
   def reversed(self):
     return self.collect()[::-1]
 
-  def product(self, *iterables, repeat=None):
+  def product(self, *iterables, repeat=1):
     return ITER(product(self.it, *iterables, repeat=repeat))
 
   def permutations(self, r=None):
