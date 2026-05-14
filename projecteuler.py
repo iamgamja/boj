@@ -683,8 +683,8 @@ class Tracker:
       self.mn_x, self.mn = x, y
       self.can_calculate = isinstance(y, (int, float, Decimal, Fraction))
       if self.can_calculate:
-        self.sum = y
-        self.mul = y
+        self.sum = 0
+        self.mul = 1
 
     if y > self.mx:
       self.mx_x, self.mx = x, y
