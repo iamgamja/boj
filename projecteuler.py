@@ -185,6 +185,9 @@ class ITER:
   def product(self, *iterables, repeat=1):
     return ITER(product(self.it, *iterables, repeat=repeat))
 
+  def starproduct(self, repeat=1):
+    return ITER(product(*self.it, repeat=repeat))
+
   def permutations(self, r=None):
     return ITER(permutations(self.it, r))
 
@@ -210,8 +213,9 @@ class ITER:
   def len(self):
     return sum(1 for _ in self.it)
 
-  def reduce(self, f, init=None):
-    return reduce(f, self.it, init)
+  def reduce(self, f, initial=None):
+    if init is None: return reduce(f, self.it)
+    return reduce(f, self.it, initial=initial)
 
   def min(self, key=None):
     return min(self.it, key=key)
@@ -223,7 +227,7 @@ class ITER:
     return sum(self.it)
 
   def mul(self):
-    return self.reduce(operator.mul)
+    return self.reduce(operator.mul, 1)
 
   def collect(self, cls=list):
     return cls(self.it)
@@ -643,10 +647,8 @@ class Sieve:
     
   def factors(self, n):
     fac = self.factorize(n)
-    keys, values, items = list(fac.keys()), fac.values(), fac.items()
-    L = len(keys)
-
-    for tp in ITER(values).map(lambda v: range(v+1)).product():
+    keys, values, items = fac.keys(), fac.values(), fac.items()
+    for tp in ITER(values).map(lambda v: range(v+1)).starproduct():
       yield ITER(keys).zip(tp).starmap(operator.pow).mul()
 
 
@@ -713,6 +715,7 @@ class Tracker:
 
 thousand = 1_000
 million = 1_000_000
+billion = 1_000_000_000
 
 ###
 
