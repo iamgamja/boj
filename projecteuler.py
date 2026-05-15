@@ -214,7 +214,7 @@ class ITER:
     return sum(1 for _ in self.it)
 
   def reduce(self, f, initial=None):
-    if init is None: return reduce(f, self.it)
+    if initial is None: return reduce(f, self.it)
     return reduce(f, self.it, initial=initial)
 
   def min(self, key=None):
