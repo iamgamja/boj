@@ -7,24 +7,11 @@ from collections import *
 import math, random, operator
 from tqdm import tqdm, trange
 
-def _gen_tokens():
-  while 1:
-    yield from input().split()
-_tokens = _gen_tokens()
-tok = _tokens.__next__
-def ii(*args):
-  '''
-  ii() -> int
-  ii(N) -> list[int]
-  ii(R, C) -> list[list[int]]
-  '''
-  if len(args) == 0: return int(tok())
-  return [ii(*args[1:]) for _ in range(args[0])]
-
-def zi(N, *args):
-  if len(args) == 0: return [0]*N
-  return [zi(*args) for _ in range(N)]
-
+import os
+_nt=iter(os.read(0,os.fstat(0).st_size).split()).__next__
+tok=lambda:_nt().decode()
+def ii(*A):return[ii(*A[1:])for _ in range(A[0])]if A else int(tok())
+def zi(*A):return[zi(*A[1:])for _ in range(A[0])]if A else 0
 
 class ITER:
   def __init__(self, it):
@@ -42,8 +29,8 @@ class ITER:
     return ITER(range(*args))
 
   @staticmethod
-  def tqdm(*args, **kargs):
-    return ITER(tqdm(range(*args), **kargs))
+  def trange(*args, **kargs):
+    return ITER(trange(*args, **kargs))
 
   @staticmethod
   def count(*args):
@@ -126,6 +113,9 @@ class ITER:
   def accumulate(self, func=None, initial=None):
     return ITER(accumulate(self.it, func, initial=initial))
 
+  def enumerate(self):
+    return ITER.count(0).zip(self.it)
+  
   def presum(self):
     return self.accumulate()
 
