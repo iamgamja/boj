@@ -18,4 +18,9 @@ struct Node {
       sum + o.sum
     );
   }
+
+  operator i64() const { return res; }
 };
+istream& operator>>(istream& in, Node& x) {
+  i64 v; in >> v; x = Node(v); return in;
+}
