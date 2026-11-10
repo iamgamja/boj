@@ -537,6 +537,7 @@ def issquare(n: int | str) -> bool:
   n = int(n)
   return isqrt(n)**2 == n
 
+'''
 def isprime(n: int | str) -> bool:
   n = int(n)
   if n <= 1: return False
@@ -555,6 +556,45 @@ def factorize(n: int) -> Counter:
   if n != 1: res[n] += 1
 
   return res
+'''
+
+def isprime(n: int) -> bool:
+  ''' 밀러라빈, i64 범위에서 안전 '''
+  
+  if n <= 1: return False
+
+  for p in (2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37):
+    if n == p: return True
+    if n % p == 0: return False
+    
+    def tmp():
+      k = n-1
+      while 1:
+        d = pow(p, k, n)
+        if k&1: return d == 1 or d == n-1
+        if d == n-1: return True
+        k >>= 1
+    if not tmp(): return False
+
+  return True
+  
+def factorize(n: int) -> Counter:  
+  if n <= 1: return Counter()
+  if isprime(n): return Counter({n: 1})
+  if n%2==0: return Counter({2: 1}) + factorize(n//2)
+
+  while 1:
+    x = y = random.randint(1, n-1)
+    c = random.randint(0, n-3)
+    while 1:
+      x = (x*x+c) % n
+      y = (y*y+c) % n
+      y = (y*y+c) % n
+    
+      g = gcd(abs(x-y), n)
+      if g == 1: continue
+      if g == n: break
+      return factorize(g) + factorize(n//g)
 
 def countFactor(n: int) -> int:
   fac = factorize(n)
@@ -564,21 +604,13 @@ def countFactor(n: int) -> int:
     res *= v+1
 
   return res
-  
-def primeFactors(self, n):
-  return self.factorize(n).keys()
 
 def factors(n: int):
   fac = factorize(n)
-  keys, values = list(fac.keys()), fac.values()
-  L = len(keys)
+  keys, values, items = fac.keys(), fac.values(), fac.items()
+  for tp in ITER(values).map(lambda v: range(v+1)).starproduct():
+    yield ITER(keys).zip(tp).starmap(operator.pow).mul()
 
-  for it in product(*[range(v+1) for v in values]):
-    yield reduce(operator.mul, starmap(operator.pow, zip(keys, it)), 1)
-
-def sumProperFactor(n: int) -> int:
-  return sum(factors(n)) - n
-  
 
 class Sieve:
   def __init__(self, N):
